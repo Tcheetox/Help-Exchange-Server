@@ -7,6 +7,12 @@ module Api::V1::ApplicationHelper
             :layout => false
     end
 
+    def render_response(statusCode, description, displayMessage = '')
+        render :json => {:description => description, :display_message => displayMessage, :timestamp => Time.now.getutc}, :status => statusCode,
+            :content_type => 'application/json',
+            :layout => false
+    end
+
     def is_numeric(obj)
         obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
     end

@@ -1,6 +1,21 @@
 class Api::V1::UsersController < Api::V1::ApplicationController
     include Api::V1::ApplicationHelper
+    rescue_from Exception, with: :server_error
     skip_before_action :doorkeeper_authorize!, only: %i[create]
+
+    # def show
+    #   Rails.logger.info("<<<<<<<<--->>>>>>>")
+    #   Rails.logger.info("SHOW ONE!")
+    # end
+
+    def destroy
+      email = current_user.email
+      if current_user.destroy
+        render_response(200, "User #{email} successfully destroyed")
+      else
+        render_error(500, 50001, "Impossible to destroy user #{email}")
+      end
+    end
 
     def create
       user = User.new(email: user_params[:email], password: user_params[:password])
@@ -10,7 +25,6 @@ class Api::V1::UsersController < Api::V1::ApplicationController
       if user.save
         # Create access token for the user, so the user won't need to login again after registration
         access_token = Doorkeeper::AccessToken.create(
-          kakou: 'caca',
           resource_owner_id: user.id,
           application_id: client_app.id,
           refresh_token: generate_refresh_token,
@@ -50,5 +64,10 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         break token unless Doorkeeper::AccessToken.exists?(refresh_token: token)
       end
     end 
+
+    protected
+    def server_error(exception)
+      render_error(500, 50000, "Internal server error")
+    end
 
 end
