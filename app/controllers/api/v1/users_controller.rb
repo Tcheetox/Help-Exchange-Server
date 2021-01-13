@@ -3,17 +3,27 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     rescue_from Exception, with: :server_error
     skip_before_action :doorkeeper_authorize!, only: %i[create]
 
-    # def show
-    #   Rails.logger.info("<<<<<<<<--->>>>>>>")
-    #   Rails.logger.info("SHOW ONE!")
-    # end
+    def update
+      # Attempt to update user's current password
+      if (user_params.has_key?(:password) && user_params.has_key?(:current_password))
+        if !Devise.password_length.include?(user_params[:password].length) 
+          render_error(403, 40301, "New password doesn't match security policies")     
+        elsif !current_user.valid_password?(user_params[:current_password])
+          render_error(403, 40302, "Current password is invalid") 
+        else
+          current_user.update(:password => user_params[:password])
+          render_response(204)
+        end
+      else # Update the user's other attributes
+
+      end
+    end
 
     def destroy
-      email = current_user.email
       if current_user.destroy
-        render_response(200, "User #{email} successfully destroyed")
+        render_response(204)
       else
-        render_error(500, 50001, "Impossible to destroy user #{email}")
+        render_error(500, 50001, "Impossible to destroy user #{current_user.email}")
       end
     end
 
@@ -54,7 +64,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     private
 
     def user_params
-      params.permit(:email, :password)
+      params.permit(:email, :password, :current_password)
     end
 
     def generate_refresh_token
@@ -69,5 +79,5 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     def server_error(exception)
       render_error(500, 50000, "Internal server error")
     end
-
+ 
 end

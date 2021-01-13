@@ -7,10 +7,14 @@ module Api::V1::ApplicationHelper
             :layout => false
     end
 
-    def render_response(statusCode, description, displayMessage = '')
-        render :json => {:description => description, :display_message => displayMessage, :timestamp => Time.now.getutc}, :status => statusCode,
-            :content_type => 'application/json',
-            :layout => false
+    def render_response(statusCode, description = '', displayMessage = '')
+        if statusCode == 204
+            head :no_content
+        else
+            render :json => {:description => description, :display_message => displayMessage, :timestamp => Time.now.getutc}, :status => statusCode,
+                :content_type => 'application/json',
+                :layout => false
+        end
     end
 
     def is_numeric(obj)
