@@ -3,6 +3,10 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     rescue_from Exception, with: :server_error
     skip_before_action :doorkeeper_authorize!, only: %i[create]
 
+    def show
+      render_response(200, user_profile)
+    end
+
     def update
       # Attempt to update user's current password
       if (user_params.has_key?(:password) && user_params.has_key?(:current_password))
@@ -14,8 +18,15 @@ class Api::V1::UsersController < Api::V1::ApplicationController
           current_user.update(:password => user_params[:password])
           render_response(204)
         end
-      else # Update the user's other attributes
-
+      else # Update user profile
+        # TODO: handle verify with email, etc.
+        current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :gender => user_params[:gender], :address => user_params[:address], :country => user_params[:country])
+        if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:country].blank?)
+          current_user.update(:completed => true)
+        else
+          current_user.update(:completed => false)
+        end
+        render_response(200, user_profile)
       end
     end
 
@@ -45,9 +56,6 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         # Return json containing access token and refresh token so that user won't need to call login API right after registration
         render(json: {
           user: {
-            #id: user.id,
-            #encrypted_email: SymmetricEncryption.encrypt(user.email),
-            #encrypted_password: SymmetricEncryption.encrypt(user.password),
             access_token: access_token.token,
             token_type: 'bearer',
             expires_in: access_token.expires_in,
@@ -62,9 +70,8 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     end
 
     private
-
     def user_params
-      params.permit(:email, :password, :current_password)
+      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :gender, :address, :country, :client_id, :client_secret) # TODO: thing about this?
     end
 
     def generate_refresh_token
@@ -74,6 +81,10 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         break token unless Doorkeeper::AccessToken.exists?(refresh_token: token)
       end
     end 
+  
+    def user_profile
+      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name, :phone => current_user.phone, :gender => current_user.gender, :address => current_user.address, :country => current_user.country, :completed => current_user.completed }
+    end
 
     protected
     def server_error(exception)
