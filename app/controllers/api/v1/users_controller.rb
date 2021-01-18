@@ -54,6 +54,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         )
         
         # Return json containing access token and refresh token so that user won't need to call login API right after registration
+        # TODO: evaluate once the email verification has been deployed
         render(json: {
           user: {
             access_token: access_token.token,
@@ -71,7 +72,11 @@ class Api::V1::UsersController < Api::V1::ApplicationController
 
     private
     def user_params
-      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret) # TODO: thing about this?
+      if (params.has_key?(:user))
+        params.require(:user).permit!
+      else # TODO: do we keep this for development purposes using POSTMAN?!
+        params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret)
+      end
     end
 
     def generate_refresh_token
