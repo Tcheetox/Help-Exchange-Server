@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2021_01_05_132533) do
     t.string "first_name"
     t.string "last_name"
     t.string "phone"
-    t.string "gender"
+    t.string "post_code"
     t.string "address"
     t.string "country"
     t.boolean "completed", default: false, null: false

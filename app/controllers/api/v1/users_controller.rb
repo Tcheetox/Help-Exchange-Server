@@ -20,8 +20,8 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         end
       else # Update user profile
         # TODO: handle verify with email, etc.
-        current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :gender => user_params[:gender], :address => user_params[:address], :country => user_params[:country])
-        if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:country].blank?)
+        current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :post_code => user_params[:post_code], :address => user_params[:address], :country => user_params[:country])
+        if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:post_code].blank? && !user_params[:country].blank?)
           current_user.update(:completed => true)
         else
           current_user.update(:completed => false)
@@ -71,7 +71,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
 
     private
     def user_params
-      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :gender, :address, :country, :client_id, :client_secret) # TODO: thing about this?
+      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret) # TODO: thing about this?
     end
 
     def generate_refresh_token
@@ -83,7 +83,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     end 
   
     def user_profile
-      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name, :phone => current_user.phone, :gender => current_user.gender, :address => current_user.address, :country => current_user.country, :completed => current_user.completed }
+      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name, :phone => current_user.phone, :address => current_user.address, :post_code => current_user.post_code, :country => current_user.country, :completed => current_user.completed }
     end
 
     protected
