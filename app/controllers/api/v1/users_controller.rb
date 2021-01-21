@@ -13,15 +13,17 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         if !Devise.password_length.include?(user_params[:password].length) 
           render_error(403, 40301, "New password doesn't match security policies")     
         elsif !current_user.valid_password?(user_params[:current_password])
-          render_error(403, 40302, "Current password is invalid") 
+          render_error(403, 40302, 'Current password is invalid') 
         else
           current_user.update(:password => user_params[:password])
           render_response(204)
         end
-      else # Update user profile
-        # TODO: handle verify with email, etc.
+      else 
+        # Confirm or discard gov_id change
+        handle_gov_id(params[:gov_id])
+        # Update user profile
         current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :post_code => user_params[:post_code], :address => user_params[:address], :country => user_params[:country])
-        if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:post_code].blank? && !user_params[:country].blank?)
+        if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:post_code].blank? && !user_params[:country].blank? && !current_user.gov_id.blank?)
           current_user.update(:completed => true)
         else
           current_user.update(:completed => false)
@@ -71,12 +73,22 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     end
 
     private
+
+    def handle_gov_id(url)
+      if url.blank? # Delete any existing storage
+        if !current_user.gov_id.blank? then current_user.gov_id.purge_later end
+        if !current_user.tmp_gov_id.blank? then current_user.tmp_gov_id.purge_later end
+      elsif !current_user.tmp_gov_id.blank? && url_for(current_user.tmp_gov_id) == url # Update current gov_id
+        current_user.gov_id.attach(current_user.tmp_gov_id.blob)
+        current_user.tmp_gov_id.detach()
+      end
+    end
+
     def user_params
       if (params.has_key?(:user))
-        params.require(:user).permit!
-      else # TODO: do we keep this for development purposes using POSTMAN?!
-        params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret)
+        params.delete :user
       end
+      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret, :gov_id)
     end
 
     def generate_refresh_token
@@ -88,12 +100,10 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     end 
   
     def user_profile
-      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name, :phone => current_user.phone, :address => current_user.address, :post_code => current_user.post_code, :country => current_user.country, :completed => current_user.completed }
+      gov_id_url = current_user.gov_id.blank? ? nil : url_for(current_user.gov_id)
+      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name,
+       :phone => current_user.phone, :address => current_user.address, :post_code => current_user.post_code, :country => current_user.country,
+       :gov_id => gov_id_url,:completed => current_user.completed }
     end
 
-    protected
-    def server_error(exception)
-      render_error(500, 50000, "Internal server error")
-    end
- 
 end

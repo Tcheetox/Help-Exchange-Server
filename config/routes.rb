@@ -15,10 +15,11 @@ Rails.application.routes.draw do
     namespace :api do
       namespace :v1 do
         resources :requests, only: [:index, :show, :update, :destroy]
-        resources :users, only: [:index, :show, :destroy, :create]
+        resources :users, only: [:destroy, :create]
         match '/users/edit', to: 'users#show', via: %i[get]
         match '/users/edit', to: 'users#destroy', via: %i[delete]
         match '/users/edit', to: 'users#update', via: %i[put]
+        match '/users/edit', to: 'users_files#update', via: %i[patch]
         #match '/testor/registrations', to: 'registrations#edit', via: %i[get]
         #devise_for :users, controllers: { registrations: 'users/registrations' }
       end

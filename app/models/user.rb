@@ -3,7 +3,8 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-  
+  has_one_attached :gov_id
+  has_one_attached :tmp_gov_id
   validates :email, format: URI::MailTo::EMAIL_REGEXP
 
   # the authenticate method from devise documentation
