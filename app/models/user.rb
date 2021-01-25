@@ -7,6 +7,9 @@ class User < ApplicationRecord
   has_one_attached :tmp_gov_id
   validates :email, format: URI::MailTo::EMAIL_REGEXP
 
+  has_many :user_help_requests
+  has_many :help_requests, :through => :user_help_requests
+
   # the authenticate method from devise documentation
   def self.authenticate(email, password)
     user = User.find_for_authentication(email: email)

@@ -22,7 +22,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         # Confirm or discard gov_id change
         handle_gov_id(params[:gov_id])
         # Update user profile
-        current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :post_code => user_params[:post_code], :address => user_params[:address], :country => user_params[:country])
+        current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :post_code => user_params[:post_code], :address => user_params[:address], :country => user_params[:country], :lng => user_params[:lng], :lat => user_params[:lat])
         if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:post_code].blank? && !user_params[:country].blank? && !current_user.gov_id.blank?)
           current_user.update(:completed => true)
         else
@@ -88,7 +88,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
       if (params.has_key?(:user))
         params.delete :user
       end
-      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret, :gov_id)
+      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret, :gov_id, :lat, :lng)
     end
 
     def generate_refresh_token
@@ -101,9 +101,9 @@ class Api::V1::UsersController < Api::V1::ApplicationController
   
     def user_profile
       gov_id_url = current_user.gov_id.blank? ? nil : url_for(current_user.gov_id)
-      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name,
-       :phone => current_user.phone, :address => current_user.address, :post_code => current_user.post_code, :country => current_user.country,
-       :gov_id => gov_id_url,:completed => current_user.completed }
+      { :email => current_user.email, :created_at => current_user.created_at, :first_name => current_user.first_name, :last_name => current_user.last_name, :phone => current_user.phone, 
+      :address => current_user.address, :post_code => current_user.post_code, :country => current_user.country, :lat => current_user.lat, :lng => current_user.lng,
+      :gov_id => gov_id_url,:completed => current_user.completed }
     end
 
 end

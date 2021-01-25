@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_18_111409) do
+ActiveRecord::Schema.define(version: 2021_01_25_095436) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name", null: false
@@ -31,6 +31,19 @@ ActiveRecord::Schema.define(version: 2021_01_18_111409) do
     t.string "checksum", null: false
     t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "help_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "title"
+    t.string "description"
+    t.integer "type"
+    t.integer "state"
+    t.datetime "pending_at"
+    t.string "address"
+    t.float "lat"
+    t.float "lng"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "oauth_access_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -61,10 +74,14 @@ ActiveRecord::Schema.define(version: 2021_01_18_111409) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
-  create_table "requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "title"
+  create_table "user_help_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "type"
+    t.bigint "user_id"
+    t.bigint "help_request_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["help_request_id"], name: "index_user_help_requests_on_help_request_id"
+    t.index ["user_id"], name: "index_user_help_requests_on_user_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -80,6 +97,8 @@ ActiveRecord::Schema.define(version: 2021_01_18_111409) do
     t.string "phone"
     t.string "post_code"
     t.string "address"
+    t.float "lat"
+    t.float "lng"
     t.string "country"
     t.boolean "completed", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true

@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
-        resources :requests, only: [:index, :show, :update, :destroy]
+        #resources :requests, only: [:index, :show, :update, :destroy]
         resources :users, only: [:destroy, :create]
         match '/users/edit', to: 'users#show', via: %i[get]
         match '/users/edit', to: 'users#destroy', via: %i[delete]
