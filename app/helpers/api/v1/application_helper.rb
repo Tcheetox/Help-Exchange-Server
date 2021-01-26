@@ -1,6 +1,7 @@
 module Api::V1::ApplicationHelper
 
     def server_error(exception)
+        Rails.logger.info("!!! #{exception}")
         render_error(500, 50000, 'Internal server error')
     end
 
@@ -24,6 +25,15 @@ module Api::V1::ApplicationHelper
 
     def is_numeric(obj)
         obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
+    end
+
+    def all_params_valid(*params_list)
+        params_list.each { |p| 
+                if !params.has_key?(p) || params[p].blank?
+                    return false
+                end
+            }
+        return true
     end
 
 end

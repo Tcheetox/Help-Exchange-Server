@@ -5,7 +5,25 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+########################################################################################
 
+# You can have finer control with:
+# rails db:drop
+
+# And then create the database without running the migrations:
+# rails db:create
+
+# Then run all your migrations:
+# rails db:migrate
+
+# If you have some seeds data, run:
+# rails db:seed
+
+# TODO: might not be relevant in production
 if Doorkeeper::Application.count.zero?
-    Doorkeeper::Application.create(name: "REACT client", redirect_uri: "", scopes: "")
-  end
+  Doorkeeper::Application.create(name: "REACT client", redirect_uri: "", scopes: "", uid: "TT77nahIltTMwQZGJZQVvGRzsQv_H9xAtvREdA6IRm0", secret: "DYLuIiq-5Fq-dtyM7Bcvi1wlHEclmA0dxeU4ng7eLAU")
+end
+
+if User.count.zero?
+  User.create(email: "tcheetoz@gmail.com", password: "Leader009")
+end

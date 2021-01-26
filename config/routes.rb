@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  namespace :api do
+    namespace :v1 do
+      get 'help_requests/create'
+    end
+  end
   use_doorkeeper
   #devise_for :users
   #resources :requests
@@ -8,6 +13,11 @@ Rails.application.routes.draw do
   # As we don’t need the app authorization, we can skip the authorizations and authorized_applications controller
   # We can also skip the applications controller, as users won’t be able to create or delete OAuth application
   Rails.application.routes.draw do
+  namespace :api do
+    namespace :v1 do
+      get 'help_requests/create'
+    end
+  end
     use_doorkeeper do
       skip_controllers :authorizations, :applications, :authorized_applications
     end
@@ -22,6 +32,7 @@ Rails.application.routes.draw do
         match '/users/edit', to: 'users_files#update', via: %i[patch]
         #match '/testor/registrations', to: 'registrations#edit', via: %i[get]
         #devise_for :users, controllers: { registrations: 'users/registrations' }
+        resources :help_requests, only: [:create]
       end
     end
     #devise_for :users, controllers: { registrations: 'users/registrations' }
