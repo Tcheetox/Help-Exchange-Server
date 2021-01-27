@@ -32,7 +32,8 @@ Rails.application.routes.draw do
         match '/users/edit', to: 'users_files#update', via: %i[patch]
         #match '/testor/registrations', to: 'registrations#edit', via: %i[get]
         #devise_for :users, controllers: { registrations: 'users/registrations' }
-        resources :help_requests, only: [:create]
+        resources :help_requests, only: [:create, :index, :update]
+        match '/help_requests/user', to: 'help_requests#index_user', via: %i[get]
       end
     end
     #devise_for :users, controllers: { registrations: 'users/registrations' }

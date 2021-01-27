@@ -7,9 +7,7 @@ module Api::V1::ApplicationHelper
 
     def render_error(statusCode, serverCode, description, displayMessage = 'An unexpected error has occured, please try again later.')
         _description = description.kind_of?(Array) ? description.join('. ') : description
-        render :json => {error: {:server_code => serverCode, :description => _description, :display_message => displayMessage, :timestamp => Time.now.getutc}}, :status => statusCode,
-            :content_type => 'application/json',
-            :layout => false
+        render_json(statusCode, {error: {:server_code => serverCode, :description => _description, :display_message => displayMessage, :timestamp => Time.now.getutc}})
     end
 
     def render_response(statusCode, body = '', displayMessage = '')
@@ -17,10 +15,14 @@ module Api::V1::ApplicationHelper
             head :no_content
         else
             content = displayMessage == '' ? body.merge(:timestamp => Time.now.getutc) : body.merge(:display_message => displayMessage).merge(:timestamp => Time.now.getutc)
-            render :json => content, :status => statusCode,
-                :content_type => 'application/json',
-                :layout => false
+            render_json(statusCode, content)
         end
+    end
+
+    def render_array_response(statusCode, body)
+        if statusCode == 204
+            head :no_content
+        else render_json(statusCode, body) end
     end
 
     def is_numeric(obj)
@@ -34,6 +36,14 @@ module Api::V1::ApplicationHelper
                 end
             }
         return true
+    end
+
+    private 
+
+    def render_json(statusCode, body)
+        render :json => body, :status => statusCode,
+            :content_type => 'application/json',
+            :layout => false
     end
 
 end
