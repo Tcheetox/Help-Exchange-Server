@@ -9,8 +9,14 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
   end
 
   # Requests associated to given user
-  def index_user
-    render_array_response(200, current_user.help_requests.select("*").joins(:user_help_requests).select("user_help_requests.user_type"))
+  def index_user 
+
+    current_user_help_requests = current_user.help_requests
+    details = UserHelpRequest.where(current_user_help_requests.ids.include?(:help_request_id)).joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")
+    augmented_requests = []
+    current_user_help_requests.each do |cuhr| augmented_requests.push(cuhr.attributes.merge(:users => details.where(:help_request_id => cuhr.id))) end
+    render_array_response(200, augmented_requests)
+
   end  
 
   def update
@@ -22,7 +28,8 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
           unless !is_owner
             if help_request.status != "cancelled" && help_request.status != "fulfilled"
               help_request.update(:status => HelpRequest.statuses[:cancelled], :help_count => 0) 
-              UserHelpRequest.where(user_id: current_user.id).where.not(user_type: UserHelpRequest.user_types[:owner]).delete_all
+              help_request.user_help_requests.where.not(user_id: current_user.id).delete_all # OK probably???
+              #UserHelpRequest.where(user_id: current_user.id).where.not(user_type: UserHelpRequest.user_types[:owner]).delete_all # KO probably!!!
             end
             interactable = true
           end
@@ -58,10 +65,12 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
           end     
       end
 
-      # Return appropriate result (augmented by UserHelpRequest attributes if request was interactable)
+      # Return appropriate result (augmented by some User attributes if request was interactable)
       if interactable 
         if user_help_request.nil? then render_response(200, help_request.attributes)
-        else render_response(200, help_request.attributes.merge(user_help_request.attributes)) end
+        else 
+          render_response(200, help_request.attributes.merge({:users => help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")}))
+        end
       else render_error(403, 40301, "You cannot interact with this help request") end
     else render_error(400, 40001, 'Missing and/or invalid parameter(s)') end
   end
@@ -93,9 +102,17 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
     @help_request ||= HelpRequest.find(params[:id])
   end
 
+  # def help_requests 
+  #   @help_requests ||= HelpRequest.where(:user_id => current_user.id)
+  # end
+
   def user_help_request
-    @user_help_request ||= UserHelpRequest.find_by(:help_request_id => help_request.id, :user_id => current_user.id)
+    @user_help_request ||= UserHelpRequest.find_by(:help_request_id => params[:id], :user_id => current_user.id)
   end
+
+  # def user_help_requests
+  #   @user_help_requests ||= UserHelpRequest.where(:user_id => current_user.id)
+  # end
 
   def is_owner
     !user_help_request.nil? && user_help_request.user_type == "owner"

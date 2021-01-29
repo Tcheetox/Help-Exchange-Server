@@ -1,5 +1,5 @@
 module Api::V1::ApplicationHelper
-
+    # TODO: 300 chars is too long for string => switch desc to text I guess...
     def server_error(exception)
         Rails.logger.info("!!! #{exception}")
         render_error(500, 50000, 'Internal server error')
