@@ -2,6 +2,7 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
   include Api::V1::ApplicationHelper
   rescue_from Exception, with: :server_error
   skip_before_action :doorkeeper_authorize!, only: %i[index]
+  #before_action :doorkeeper_authorize!, except: :index
 
   # Requests that can be shown on map
   def index

@@ -9,6 +9,7 @@ gem 'doorkeeper', '~> 5.4.0'
 gem 'rack-cors'
 gem 'symmetric-encryption'
 gem 'figaro'
+#gem 'active_model_serializers'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
 # Use mysql as the database for Active Record

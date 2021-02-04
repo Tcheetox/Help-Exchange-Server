@@ -26,4 +26,6 @@ end
 
 if User.count.zero?
   User.create(email: "tcheetoz@gmail.com", password: "Leader009")
+  User.create(email: "tcheetox@gmail.com", password: "Leader009")
+  User.create(email: "tcheetoy@gmail.com", password: "Leader009")
 end

@@ -9,6 +9,7 @@ class User < ApplicationRecord
 
   has_many :user_help_requests
   has_many :help_requests, :through => :user_help_requests
+  #has_many :conversations
 
   # the authenticate method from devise documentation
   def self.authenticate(email, password)

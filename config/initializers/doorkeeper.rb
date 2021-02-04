@@ -424,7 +424,7 @@ Doorkeeper.configure do
   # to `controller` (authorizations controller instance) and `context`
   # (Doorkeeper::OAuth::Hooks::Context instance) which provides pre auth
   # or auth objects with issued token based on hook type (before or after).
-  #
+  
   before_successful_authorization do |controller, context|
     # Implementation of refresh_token expiration = access_token expiration
     if (controller.request.params[:grant_type] == 'refresh_token')
@@ -442,15 +442,8 @@ Doorkeeper.configure do
       end
     end
   end
-  #
+  
   after_successful_authorization do |controller, context|
-    # controller.session[:logout_urls] <<
-    #   Doorkeeper::Application
-    #     .find_by(controller.request.params.slice(:redirect_uri))
-    #     .logout_uri
-    #Rails.logger.info(context.auth.token.class.name)
-    #Rails.logger.info(context.auth.inspect)
-
     # Nasty hack to pass long-lived cookie to client
     unless controller.request.params[:grant_type] == 'refresh_token'
       context.auth.token.scopes = SymmetricEncryption.encrypt({:email => controller.request.params[:email], :password => controller.request.params[:password]}.to_json)

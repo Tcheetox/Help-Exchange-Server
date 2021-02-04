@@ -34,6 +34,9 @@ Rails.application.routes.draw do
         #devise_for :users, controllers: { registrations: 'users/registrations' }
         resources :help_requests, only: [:create, :index, :update]
         match '/help_requests/user', to: 'help_requests#index_user', via: %i[get]
+
+        mount ActionCable.server => '/users/:token/cable'
+        resources :conversations, only: [:index, :create, :show]
       end
     end
     #devise_for :users, controllers: { registrations: 'users/registrations' }

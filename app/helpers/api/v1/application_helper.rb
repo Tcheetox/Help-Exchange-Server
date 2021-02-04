@@ -13,6 +13,8 @@ module Api::V1::ApplicationHelper
     def render_response(statusCode, body = '', displayMessage = '')
         if statusCode == 204
             head :no_content
+        elsif !body.nil? && (body.kind_of?(ActiveRecord::Relation) || body.kind_of?(Array))
+            render_json(statusCode, body)
         else
             content = displayMessage == '' ? body.merge(:timestamp => Time.now.getutc) : body.merge(:display_message => displayMessage).merge(:timestamp => Time.now.getutc)
             render_json(statusCode, content)
