@@ -37,6 +37,9 @@ Rails.application.routes.draw do
 
         mount ActionCable.server => '/users/:token/cable'
         resources :conversations, only: [:index, :create, :show]
+
+        resources :faq, only: [:index]
+
       end
     end
     #devise_for :users, controllers: { registrations: 'users/registrations' }

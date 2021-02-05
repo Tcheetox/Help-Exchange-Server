@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_02_190455) do
+ActiveRecord::Schema.define(version: 2021_02_05_081124) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name", null: false
@@ -42,6 +42,14 @@ ActiveRecord::Schema.define(version: 2021_02_02_190455) do
     t.index ["help_request_id"], name: "index_conversations_on_help_request_id"
     t.index ["owner_user_id"], name: "index_conversations_on_owner_user_id"
     t.index ["respondent_user_id"], name: "index_conversations_on_respondent_user_id"
+  end
+
+  create_table "faqs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "question"
+    t.string "response"
+    t.string "keywords", default: "[]"
   end
 
   create_table "help_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|

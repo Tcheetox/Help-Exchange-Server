@@ -29,3 +29,7 @@ if User.count.zero?
   User.create(email: "tcheetox@gmail.com", password: "Leader009")
   User.create(email: "tcheetoy@gmail.com", password: "Leader009")
 end
+
+if Faq.count.zero?
+  Faq.create(question: "How to delete my account?", response: "You can delete your account at anytime using your profile configuration page.", keywords: ["delete my account", "remove", "quit"])
+end
