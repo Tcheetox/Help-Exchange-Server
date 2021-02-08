@@ -12,6 +12,7 @@ class Api::V1::ConversationsController < Api::V1::ApplicationController
     def show
       conversation = Conversation.find(params[:id]) 
       if conversation.owner_user_id == current_user.id || conversation.respondent_user_id == current_user.id
+        testor = conversation.messages.where.not(:user_id => current_user.id).where(:status => Message.statuses[:unread])
         conversation.messages.where.not(:user_id => current_user.id).where(:status => Message.statuses[:unread]).update_all(:status => Message.statuses[:read])
         render_response(200, conversation.messages.joins(:user).select("messages.*, users.first_name as user_first_name, users.last_name as user_last_name").order(updated_at: :asc))
       else
@@ -29,7 +30,11 @@ class Api::V1::ConversationsController < Api::V1::ApplicationController
             augmented_conversation = conversation.attributes.merge({:help_request_title => help_request.title, :target_user_id => target_user.id, 
               :target_user_first_name => target_user.first_name, :target_user_last_name => target_user.last_name, :total_messages => 0, :unread_messages => 0}).except!("owner_user_id", "respondent_user_id")
             
-            ActionCable.server.broadcast 'conversations_channel', augmented_conversation
+            # Broadcast to both parties
+            ConversationsChannel.broadcast_to(conversation.owner_user, augmented_conversation)
+            ConversationsChannel.broadcast_to(conversation.respondent_user, augmented_conversation)
+
+            #ActionCable.server.broadcast 'conversations_channel', augmented_conversation
             render_response(201, augmented_conversation)
             return
           end

@@ -32,7 +32,9 @@ Rails.application.routes.draw do
         match '/users/edit', to: 'users_files#update', via: %i[patch]
         #match '/testor/registrations', to: 'registrations#edit', via: %i[get]
         #devise_for :users, controllers: { registrations: 'users/registrations' }
-        resources :help_requests, only: [:create, :index, :update]
+
+        resources :help_requests, only: [:create, :index]
+        match '/help_requests/:id/:subaction', to: 'help_requests#update', via: %i[put]
         match '/help_requests/user', to: 'help_requests#index_user', via: %i[get]
 
         mount ActionCable.server => '/users/:token/cable'

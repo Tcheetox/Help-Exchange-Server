@@ -1,4 +1,4 @@
-class ConversationsChannel < ApplicationCable::Channel
+class HelpRequestsChannel < ApplicationCable::Channel
 
   def subscribed
     reject unless current_user
@@ -8,5 +8,5 @@ class ConversationsChannel < ApplicationCable::Channel
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
   end
-
+  
 end

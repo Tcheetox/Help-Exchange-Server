@@ -2,78 +2,74 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
   include Api::V1::ApplicationHelper
   rescue_from Exception, with: :server_error
   skip_before_action :doorkeeper_authorize!, only: %i[index]
-  #before_action :doorkeeper_authorize!, except: :index
 
+  # TODO: store blob url in profile as string!!! efficiency 
+  
   # Requests that can be shown on map
   def index
-    render_array_response(200, HelpRequest.where(:status => "published"))
+    render_array_response(200, HelpRequest.where(:status => "published").joins(:users).where("user_help_requests.user_type = 'owner'").select("help_requests.*, user_help_requests.user_id as owner_id"))
   end
 
   # Requests associated to given user
   def index_user 
-
     current_user_help_requests = current_user.help_requests
     details = UserHelpRequest.where(current_user_help_requests.ids.include?(:help_request_id)).joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")
     augmented_requests = []
     current_user_help_requests.each do |cuhr| augmented_requests.push(cuhr.attributes.merge(:users => details.where(:help_request_id => cuhr.id))) end
     render_array_response(200, augmented_requests)
-
   end  
 
   def update
-    if all_params_valid(:id, :subaction)
-      interactable = false
-      case params[:subaction].downcase
+    interactable = false
+    case params[:subaction].downcase
 
-        when "cancel" # Owner only
-          unless !is_owner
-            if help_request.status != "cancelled" && help_request.status != "fulfilled"
-              help_request.update(:status => HelpRequest.statuses[:cancelled], :help_count => 0) 
-              help_request.user_help_requests.where.not(user_id: current_user.id).delete_all # OK probably???
-              #UserHelpRequest.where(user_id: current_user.id).where.not(user_type: UserHelpRequest.user_types[:owner]).delete_all # KO probably!!!
-            end
-            interactable = true
+      when "cancel" # Owner only
+        unless !is_owner
+          if help_request.status != "cancelled" && help_request.status != "fulfilled"
+            help_request.update(:status => HelpRequest.statuses[:cancelled], :help_count => 0) 
+            help_request.user_help_requests.where.not(user_id: current_user.id).delete_all
           end
-        when "republish" # Owner only
-          unless !is_owner
-            if help_request.status == "cancelled" || (help_request.status == "pending" && !help_request.pending_at.isblank? && DateTime.current - help_request.pending_at > 1.days)
-              help_request.update(:status => HelpRequest.statuses[:published])
-            end
-            interactable = true
+          interactable = true
+        end
+      when "republish" # Owner only
+        unless !is_owner
+          if help_request.status == "cancelled" || (help_request.status == "pending" && !help_request.pending_at.isblank? && DateTime.current - help_request.pending_at > 1.days)
+            help_request.update(:status => HelpRequest.statuses[:published])
           end
-        when "subscribe" # Respondent only 
-          unless is_owner
-            if help_request.status == "published" && help_request.help_count < 5 && !is_respondent
-              current_user.user_help_requests.create(:help_request_id => help_request.id, :user_type => UserHelpRequest.user_types[:respondent])
-              if help_request.help_count == 4
-                help_request.update(:help_count => help_request.help_count + 1, :status => HelpRequest.statuses[:pending], :pending_at => DateTime.current)
-              else help_request.update(:help_count => help_request.help_count + 1) end
-            end
-            interactable = true
-          end 
-        when "unsubscribe" # Respondent only  
-          unless !is_respondent 
-            if help_request.status == "published" || help_request.status == "pending"
-              user_help_request.delete
-              help_request.update(:help_count => help_request.help_count - 1)
-            end
-            interactable = true
+          interactable = true
+        end
+      when "subscribe" # Respondent only 
+        unless is_owner
+          if help_request.status == "published" && help_request.help_count < 5 && !is_respondent
+            current_user.user_help_requests.create(:help_request_id => help_request.id, :user_type => UserHelpRequest.user_types[:respondent])
+            if help_request.help_count == 4
+              help_request.update(:help_count => help_request.help_count + 1, :status => HelpRequest.statuses[:pending], :pending_at => DateTime.current)
+            else help_request.update(:help_count => help_request.help_count + 1) end
           end
-        when "markasfulfilled" # Both owner and respondents   
-          unless !is_owner && !is_respondent
-            if help_request.status != "cancelled" && help_request.status != "fulfilled" then help_request.update(:status => HelpRequest.statuses[:fulfilled]) end
-            interactable = true
-          end     
-      end
+          interactable = true
+        end 
+      when "unsubscribe" # Respondent only  
+        unless !is_respondent 
+          if help_request.status == "published" || help_request.status == "pending"
+            user_help_request.delete
+            help_request.update(:help_count => help_request.help_count - 1)
+          end
+          interactable = true
+        end
+      when "markasfulfilled" # Both owner and respondents   
+        unless !is_owner && !is_respondent
+          if help_request.status != "cancelled" && help_request.status != "fulfilled" then help_request.update(:status => HelpRequest.statuses[:fulfilled]) end
+          interactable = true
+        end     
+    end
 
       # Return appropriate result (augmented by some User attributes if request was interactable)
       if interactable 
-        if user_help_request.nil? then render_response(200, help_request.attributes)
-        else 
-          render_response(200, help_request.attributes.merge({:users => help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")}))
-        end
+        augmented_help_request = !help_request.users.include?(current_user) ? help_request.attributes.merge({:users => []}) : help_request.attributes.merge({:users => help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")})
+        if !help_request.users.include?(current_user) then  HelpRequestsChannel.broadcast_to(current_user, augmented_help_request) end
+        help_request.users.each do |u| HelpRequestsChannel.broadcast_to(u, augmented_help_request) end
+        render_response(200, augmented_help_request)
       else render_error(403, 40301, "You cannot interact with this help request") end
-    else render_error(400, 40001, 'Missing and/or invalid parameter(s)') end
   end
 
   def create
