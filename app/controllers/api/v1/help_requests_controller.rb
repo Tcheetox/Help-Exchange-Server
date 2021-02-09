@@ -80,7 +80,10 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
       
       # Update joint-table (:through has_many relationship) to enforce the current_user as the owner of the help_request 
       current_user.user_help_requests.find_by(:help_request_id => new_help_request.id).update(:user_type => UserHelpRequest.user_types[:owner])
-      render_response(201, new_help_request.attributes)
+
+      augmented_help_request = new_help_request.attributes.merge({:users => new_help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")})
+      new_help_request.users.each do |u| HelpRequestsChannel.broadcast_to(u, augmented_help_request) end
+      render_response(201, augmented_help_request)
     else
       render_error(400, 40001, 'Missing and/or invalid parameter(s)') 
     end
@@ -99,17 +102,9 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
     @help_request ||= HelpRequest.find(params[:id])
   end
 
-  # def help_requests 
-  #   @help_requests ||= HelpRequest.where(:user_id => current_user.id)
-  # end
-
   def user_help_request
     @user_help_request ||= UserHelpRequest.find_by(:help_request_id => params[:id], :user_id => current_user.id)
   end
-
-  # def user_help_requests
-  #   @user_help_requests ||= UserHelpRequest.where(:user_id => current_user.id)
-  # end
 
   def is_owner
     !user_help_request.nil? && user_help_request.user_type == "owner"

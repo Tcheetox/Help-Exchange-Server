@@ -3,10 +3,8 @@ class MessagesChannel < ApplicationCable::Channel
   rescue_from Exception, with: :server_error
 
   def subscribed
-    reject unless current_user
-    conv = Conversation.find(params[:conversation])
-    reject unless conv.respondent_user == current_user || conv.owner_user == current_user
-    stream_for Conversation.find(params[:conversation])
+    reject unless current_user && (conversation.respondent_user == current_user || conversation.owner_user == current_user)
+    stream_for conversation
   end
 
   def unsubscribed
@@ -32,9 +30,6 @@ class MessagesChannel < ApplicationCable::Channel
   private
 
   def conversation
-    #Rails.logger.info(">>>>>>>>>>>>>>>>>>>>>>>>")
-   # Rails.logger.info(params[:conversation][:id])
-   # Conversation.find(params[:conversation][:id]) 
     @conversation ||= Conversation.find(params["conversation"]) 
   end
 
