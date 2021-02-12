@@ -6,17 +6,16 @@ class Api::V1::ConversationsController < Api::V1::ApplicationController
     def index
       conversations = Conversation.where("owner_user_id = #{current_user.id} OR respondent_user_id = #{current_user.id}").joins("INNER JOIN users ON (users.id = conversations.owner_user_id OR users.id = conversations.respondent_user_id) AND users.id != #{current_user.id}").joins(:help_request).joins("LEFT OUTER JOIN messages ON conversations.id = messages.conversation_id")
       .select("conversations.id, conversations.created_at, conversations.updated_at, conversations.help_request_id, help_requests.title as help_request_title, users.id as target_user_id, users.first_name as target_user_first_name, users.last_name as target_user_last_name, COUNT(messages.id) AS total_messages, SUM(CASE WHEN messages.status = 0 AND messages.user_id != #{current_user.id} THEN 1 ELSE 0 END) AS unread_messages").group(:id)
-      render_response(200, conversations)
+      return render_response(200, conversations)
     end
 
     def show
       conversation = Conversation.find(params[:id]) 
       if conversation.owner_user_id == current_user.id || conversation.respondent_user_id == current_user.id
-        testor = conversation.messages.where.not(:user_id => current_user.id).where(:status => Message.statuses[:unread])
         conversation.messages.where.not(:user_id => current_user.id).where(:status => Message.statuses[:unread]).update_all(:status => Message.statuses[:read])
-        render_response(200, conversation.messages.joins(:user).select("messages.*, users.first_name as user_first_name, users.last_name as user_last_name").order(updated_at: :asc))
+        return render_response(200, conversation.messages.joins(:user).select("messages.*, users.first_name as user_first_name, users.last_name as user_last_name").order(updated_at: :asc))
       else
-        render_error(400, 40001, 'Missing and/or invalid parameter(s)')
+        return render_error(40001)
       end
     end
 
@@ -35,19 +34,16 @@ class Api::V1::ConversationsController < Api::V1::ApplicationController
             ConversationsChannel.broadcast_to(conversation.respondent_user, augmented_conversation)
 
             #ActionCable.server.broadcast 'conversations_channel', augmented_conversation
-            render_response(201, augmented_conversation)
-            return
+            return render_response(201, augmented_conversation)
           end
         end
-        render_error(400, 40001, 'Missing and/or invalid parameter(s)')
+        return render_error(40001)
     end
 
     private
 
     def conversation_params
-      if (params.has_key?(:conversation))
-        params.delete :conversation
-      end
+      params.delete :conversation unless !params.has_key?(:conversation)
       params.permit(:help_request_id, :target_user_id)
     end
 

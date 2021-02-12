@@ -1,11 +1,11 @@
 class RequestsController < ApplicationController
-  before_action :authenticate_user!
+  #before_action :authenticate_user!
   before_action :set_request, only: [:show, :edit, :update, :destroy]
 
   # GET /requests
   # GET /requests.json
   def index
-    @requests = Request.all
+    @requests = HelpRequest.all
   end
 
   # GET /requests/1
@@ -15,7 +15,7 @@ class RequestsController < ApplicationController
 
   # GET /requests/new
   def new
-    @request = Request.new
+    @request = HelpRequest.new
   end
 
   # GET /requests/1/edit
@@ -25,7 +25,7 @@ class RequestsController < ApplicationController
   # POST /requests
   # POST /requests.json
   def create
-    @request = Request.new(request_params)
+    @request = HelpRequest.new(request_params)
 
     respond_to do |format|
       if @request.save
@@ -65,7 +65,7 @@ class RequestsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_request
-      @request = Request.find(params[:id])
+      @request = HelpRequest.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

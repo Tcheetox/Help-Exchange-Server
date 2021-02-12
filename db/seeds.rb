@@ -24,12 +24,12 @@ if Doorkeeper::Application.count.zero?
   Doorkeeper::Application.create(name: "REACT client", redirect_uri: "", scopes: "", uid: "TT77nahIltTMwQZGJZQVvGRzsQv_H9xAtvREdA6IRm0", secret: "DYLuIiq-5Fq-dtyM7Bcvi1wlHEclmA0dxeU4ng7eLAU")
 end
 
-if User.count.zero?
-  User.create(email: "tcheetoz@gmail.com", password: "Leader009")
-  User.create(email: "tcheetox@gmail.com", password: "Leader009")
-  User.create(email: "tcheetoy@gmail.com", password: "Leader009")
-end
-
 if Faq.count.zero?
   Faq.create(question: "How to delete my account?", response: "You can delete your account at anytime using your profile configuration page.", keywords: ["delete my account", "remove", "quit"])
 end
+
+# if User.count.zero?
+#   User.create(email: "tcheetoz@gmail.com", password: "Leader009")
+#   User.create(email: "tcheetox@gmail.com", password: "Leader009")
+#   User.create(email: "tcheetoy@gmail.com", password: "Leader009")
+# end

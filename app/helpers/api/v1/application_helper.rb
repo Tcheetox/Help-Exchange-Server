@@ -1,30 +1,58 @@
 module Api::V1::ApplicationHelper
-    # TODO: 300 chars is too long for string => switch desc to text I guess...
+
+    def verify_client_app
+        return render_error(40001) unless params.has_key?(:client_id) && params.has_key?(:client_secret)
+        return render_error(40000) unless (client_app ||= Doorkeeper::Application.find_by(uid: params[:client_id])) && client_app.secret == params[:client_secret]
+    end
+
     def server_error(exception)
         Rails.logger.info("!!! #{exception}")
-        render_error(500, 50000, 'Internal server error')
+        render_error(50000)
     end
 
-    def render_error(statusCode, serverCode, description, displayMessage = 'An unexpected error has occured, please try again later.')
-        _description = description.kind_of?(Array) ? description.join('. ') : description
-        render_json(statusCode, {error: {:server_code => serverCode, :description => _description, :display_message => displayMessage, :timestamp => Time.now.getutc}})
+    def render_error(serverCode, additionalDescription = '')
+
+        case serverCode
+            when 40000
+                description = 'Invalid client information'
+            when 40001
+                description = 'Missing and/or invalid parameter(s)'
+            when 40002
+                description = 'Invalid input file'
+            when 40003
+                description = 'Unsupported file type'
+            when 40004
+                description = 'Email not found'
+            when 40300
+                description = "New password doesn't match security policies"
+            when 40301
+                description = 'You cannot interact with this ressource'
+            when 40302
+                description = 'Current password is invalid'
+            when 42201
+                description = 'Impossible to save ressource'
+            when 50000
+                description = 'Internal server error'
+            when 50001
+                description = 'Impossible to destroy ressource'
+        end
+
+        _additionalDescription = additionalDescription.kind_of?(Array) ? additionalDescription.join('. ') : additionalDescription
+        if _additionalDescription.blank?
+            return render_json(serverCode.to_s.first(3).to_i, {error: {:server_code => serverCode, :description => description, :timestamp => Time.now.getutc}})
+        else 
+            return render_json(serverCode.to_s.first(3).to_i, {error: {:server_code => serverCode, :description => description, :additional_description => _additionalDescription, :timestamp => Time.now.getutc}})
+        end
     end
 
-    def render_response(statusCode, body = '', displayMessage = '')
+    def render_response(statusCode, body = '')
         if statusCode == 204
             head :no_content
         elsif !body.nil? && (body.kind_of?(ActiveRecord::Relation) || body.kind_of?(Array))
             render_json(statusCode, body)
         else
-            content = displayMessage == '' ? body.merge(:timestamp => Time.now.getutc) : body.merge(:display_message => displayMessage).merge(:timestamp => Time.now.getutc)
-            render_json(statusCode, content)
+            render_json(statusCode, body.merge(:timestamp => Time.now.getutc))
         end
-    end
-
-    def render_array_response(statusCode, body)
-        if statusCode == 204
-            head :no_content
-        else render_json(statusCode, body) end
     end
 
     def is_numeric(obj)

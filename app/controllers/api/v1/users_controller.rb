@@ -1,34 +1,54 @@
 class Api::V1::UsersController < Api::V1::ApplicationController
     include Api::V1::ApplicationHelper
     rescue_from Exception, with: :server_error
-    skip_before_action :doorkeeper_authorize!, only: %i[create]
+    skip_before_action :doorkeeper_authorize!, only: [:create, :update_without_password]
+
+    # TODO: change destroy method
+    # TODO: store blob url in profile as string!!! efficiency 
 
     def show
       render_response(200, user_profile)
+    end
+
+    def update_without_password
+      verify_client_app
+      case user_params[:subaction].downcase
+
+        when 'forgotten_password'
+          return render_error(40001) unless user_params.has_key?(:password) && user_params.has_key?(:reset_password_token) && (user ||= User.find_by(:reset_password_token => Devise.token_generator.digest(User,:reset_password_token, user_params[:reset_password_token])))
+          return render_error(40300) unless Devise.password_length.include?(user_params[:password].length)  
+          user.update(:password => user_params[:password])
+          return render_response(204)
+        
+        when 'confirm_account'
+          return render_error(40001) unless (user ||= User.find_by(:confirmation_token => user_params[:confirmation_token]))
+          user.update(:confirmed_at => DateTime.current)
+          return render_response(204)
+     
+      end
+      return render_error(40001) 
     end
 
     def update
       # Attempt to update user's current password
       if (user_params.has_key?(:password) && user_params.has_key?(:current_password))
         if !Devise.password_length.include?(user_params[:password].length) 
-          render_error(403, 40301, "New password doesn't match security policies")     
+          return render_error(40300)     
         elsif !current_user.valid_password?(user_params[:current_password])
-          render_error(403, 40302, 'Current password is invalid') 
+          return render_error(40302) 
         else
           current_user.update(:password => user_params[:password])
-          render_response(204)
+          return render_response(204)
         end
+      
+      # Update any other information from profile
       else 
-        # Confirm or discard gov_id change
-        handle_gov_id(params[:gov_id])
-        # Update user profile
+        handle_gov_id(params[:gov_id]) # Confirm or discard gov_id change
         current_user.update(:first_name => user_params[:first_name], :last_name => user_params[:last_name], :phone => user_params[:phone], :post_code => user_params[:post_code], :address => user_params[:address], :country => user_params[:country], :lng => user_params[:lng], :lat => user_params[:lat])
         if (!user_params[:first_name].blank? && !user_params[:last_name].blank? && !user_params[:phone].blank? && !user_params[:address].blank? && !user_params[:post_code].blank? && !user_params[:country].blank? && !current_user.gov_id.blank?)
           current_user.update(:completed => true)
-        else
-          current_user.update(:completed => false)
-        end
-        render_response(200, user_profile)
+        else current_user.update(:completed => false) end
+        return render_response(200, user_profile)
       end
     end
 
@@ -36,39 +56,20 @@ class Api::V1::UsersController < Api::V1::ApplicationController
       if current_user.destroy
         render_response(204)
       else
-        render_error(500, 50001, "Impossible to destroy user #{current_user.email}")
+        render_error(50001, "Impossible to destroy user #{current_user.email}")
       end
     end
 
     def create
+      verify_client_app
       user = User.new(email: user_params[:email], password: user_params[:password])
-      client_app = Doorkeeper::Application.find_by(uid: params[:client_id])
-      return render_error(403, 40300, 'Invalid client ID') unless client_app
-
+      user.skip_confirmation_notification!
       if user.save
-        # Create access token for the user, so the user won't need to login again after registration
-        access_token = Doorkeeper::AccessToken.create(
-          resource_owner_id: user.id,
-          application_id: client_app.id,
-          refresh_token: generate_refresh_token,
-          expires_in: Doorkeeper.configuration.access_token_expires_in.to_i,
-          scopes: ''
-        )
-        
-        # Return json containing access token and refresh token so that user won't need to call login API right after registration
-        # TODO: evaluate once the email verification has been deployed
-        render(json: {
-          user: {
-            access_token: access_token.token,
-            token_type: 'bearer',
-            expires_in: access_token.expires_in,
-            refresh_token: access_token.refresh_token,
-            created_at: access_token.created_at.to_time.to_i
-          }
-        })
+        Thread.new { user.send_confirmation_instructions }
+        render_response(201, {:message => 'User email must be confirmed to allow authentication'})
       else
         # Email already in use
-        render_error(422, 42201, user.errors.full_messages, '')
+        render_error(42201, user.errors.full_messages)
       end
     end
 
@@ -76,8 +77,8 @@ class Api::V1::UsersController < Api::V1::ApplicationController
 
     def handle_gov_id(url)
       if url.blank? # Delete any existing storage
-        if !current_user.gov_id.blank? then current_user.gov_id.purge_later end
-        if !current_user.tmp_gov_id.blank? then current_user.tmp_gov_id.purge_later end
+        current_user.gov_id.purge_later unless current_user.gov_id.blank?
+        current_user.tmp_gov_id.purge_later unless current_user.tmp_gov_id.blank?
       elsif !current_user.tmp_gov_id.blank? && url_for(current_user.tmp_gov_id) == url # Update current gov_id
         current_user.gov_id.attach(current_user.tmp_gov_id.blob)
         current_user.tmp_gov_id.detach()
@@ -85,10 +86,8 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     end
 
     def user_params
-      if (params.has_key?(:user))
-        params.delete :user
-      end
-      params.permit(:email, :password, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret, :gov_id, :lat, :lng)
+      params.delete :user unless !params.has_key?(:user)
+      params.permit(:email, :password, :subaction, :confirmation_token, :reset_password_token, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret, :gov_id, :lat, :lng)
     end
 
     def generate_refresh_token

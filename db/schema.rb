@@ -54,7 +54,7 @@ ActiveRecord::Schema.define(version: 2021_02_05_081124) do
 
   create_table "help_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "title"
-    t.string "description"
+    t.text "description"
     t.datetime "pending_at"
     t.string "address"
     t.float "lat"
@@ -120,7 +120,9 @@ ActiveRecord::Schema.define(version: 2021_02_05_081124) do
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "first_name"
@@ -132,6 +134,7 @@ ActiveRecord::Schema.define(version: 2021_02_05_081124) do
     t.float "lng"
     t.string "country"
     t.boolean "completed", default: false, null: false
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

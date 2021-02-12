@@ -4,7 +4,7 @@ class Api::V1::FaqController < Api::V1::ApplicationController
     skip_before_action :doorkeeper_authorize!, only: %i[index]
 
     def index
-        render_response(200, Faq.all)
+        return render_response(200, Faq.all)
     end
 
 end

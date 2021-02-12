@@ -3,20 +3,19 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
   rescue_from Exception, with: :server_error
   skip_before_action :doorkeeper_authorize!, only: %i[index]
 
-  # TODO: store blob url in profile as string!!! efficiency 
-  
   # Requests that can be shown on map
   def index
-    render_array_response(200, HelpRequest.where(:status => "published").joins(:users).where("user_help_requests.user_type = 'owner'").select("help_requests.*, user_help_requests.user_id as owner_id"))
+    render_response(200, HelpRequest.where(:status => "published").joins(:users).where("user_help_requests.user_type = 'owner'").select("help_requests.*, user_help_requests.user_id as owner_id"))
   end
 
+  # TODO: refactor the below methods
   # Requests associated to given user
-  def index_user 
+  def filter
     current_user_help_requests = current_user.help_requests
     details = UserHelpRequest.where(current_user_help_requests.ids.include?(:help_request_id)).joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")
     augmented_requests = []
     current_user_help_requests.each do |cuhr| augmented_requests.push(cuhr.attributes.merge(:users => details.where(:help_request_id => cuhr.id))) end
-    render_array_response(200, augmented_requests)
+    render_response(200, augmented_requests)
   end  
 
   def update
@@ -65,11 +64,11 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
 
       # Return appropriate result (augmented by some User attributes if request was interactable)
       if interactable 
-        augmented_help_request = !help_request.users.include?(current_user) ? help_request.attributes.merge({:users => []}) : help_request.attributes.merge({:users => help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")})
-        if !help_request.users.include?(current_user) then  HelpRequestsChannel.broadcast_to(current_user, augmented_help_request) end
+        augmented_help_request = help_request.attributes.merge({:users => help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")})
+        HelpRequestsChannel.broadcast_to(current_user, augmented_help_request) unless help_request.users.include?(current_user)
         help_request.users.each do |u| HelpRequestsChannel.broadcast_to(u, augmented_help_request) end
-        render_response(200, augmented_help_request)
-      else render_error(403, 40301, "You cannot interact with this help request") end
+        return render_response(200, augmented_help_request)
+      else return render_error(40301) end
   end
 
   def create
@@ -83,18 +82,16 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
 
       augmented_help_request = new_help_request.attributes.merge({:users => new_help_request.user_help_requests.joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")})
       new_help_request.users.each do |u| HelpRequestsChannel.broadcast_to(u, augmented_help_request) end
-      render_response(201, augmented_help_request)
+      return render_response(201, augmented_help_request)
     else
-      render_error(400, 40001, 'Missing and/or invalid parameter(s)') 
+      return render_error(40001) 
     end
   end
 
   private
 
   def help_params
-    if (params.has_key?(:help_request))
-      params.delete :help_request
-    end
+    params.delete :help_request unless !params.has_key?(:help_request)
     params.permit(:title, :description, :help_type, :address, :lat, :lng)
   end
 
