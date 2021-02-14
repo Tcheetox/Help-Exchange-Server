@@ -8,7 +8,6 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
     render_response(200, HelpRequest.where(:status => "published").joins(:users).where("user_help_requests.user_type = 'owner'").select("help_requests.*, user_help_requests.user_id as owner_id"))
   end
 
-  # TODO: refactor the below method
   # Requests associated to given user
   def filter
     current_user_help_requests = current_user.help_requests

@@ -33,8 +33,6 @@ module Api::V1::ApplicationHelper
                 description = 'Impossible to save ressource'
             when 50000
                 description = 'Internal server error'
-            when 50001
-                description = 'Impossible to destroy ressource'
         end
 
         _additionalDescription = additionalDescription.kind_of?(Array) ? additionalDescription.join('. ') : additionalDescription

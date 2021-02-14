@@ -19,7 +19,7 @@
 # If you have some seeds data, run:
 # rails db:seed
 
-# TODO: might not be relevant in production
+# The below might not be relevant in production
 if Doorkeeper::Application.count.zero?
   Doorkeeper::Application.create(name: "REACT client", redirect_uri: "", scopes: "", uid: "TT77nahIltTMwQZGJZQVvGRzsQv_H9xAtvREdA6IRm0", secret: "DYLuIiq-5Fq-dtyM7Bcvi1wlHEclmA0dxeU4ng7eLAU")
 end

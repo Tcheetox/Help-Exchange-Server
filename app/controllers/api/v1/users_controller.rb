@@ -3,9 +3,6 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     rescue_from Exception, with: :server_error
     skip_before_action :doorkeeper_authorize!, only: [:create, :update_without_password]
 
-    # TODO: change destroy method
-    # TODO: store blob url in profile as string!!! efficiency 
-
     def show
       render_response(200, user_profile)
     end
@@ -52,23 +49,21 @@ class Api::V1::UsersController < Api::V1::ApplicationController
       end
     end
 
-    def destroy
-      if current_user.destroy
-        render_response(204)
-      else
-        render_error(50001, "Impossible to destroy user #{current_user.email}")
-      end
+    def destroy # Soft delete
+      current_user.update_attribute(:deleted_at, Time.current)
+      current_user.update_attribute(:email, nil)
+      render_response(204)
     end
 
     def create
       verify_client_app
+      return render_error(40001) unless !user_params[:email].blank?
       user = User.new(email: user_params[:email], password: user_params[:password])
       user.skip_confirmation_notification!
       if user.save
         Thread.new { user.send_confirmation_instructions }
         render_response(201, {:message => 'User email must be confirmed to allow authentication'})
-      else
-        # Email already in use
+      else # Email already in use
         render_error(42201, user.errors.full_messages)
       end
     end
