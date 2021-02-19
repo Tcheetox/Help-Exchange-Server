@@ -6,14 +6,15 @@ Rails.application.routes.draw do
   devise_for :users, only: []
 
   Rails.application.routes.draw do
-    # use_doorkeeper do
-    #   skip_controllers :authorizations, :applications, :authorized_applications
-    # end
+
     scope(path: '/krenier/fishforhelp') do
-      use_doorkeeper
+      use_doorkeeper scope: 'api/v1/oauth' do
+        skip_controllers :authorizations, :applications, :authorized_applications
+      end
 
       namespace :api do
         namespace :v1 do
+
           resources :users, only: [:create]
           match '/users', to: 'users#show', via: %i[get]
           match '/users', to: 'users#destroy', via: %i[delete]
@@ -30,6 +31,7 @@ Rails.application.routes.draw do
           resources :conversations, only: [:index, :create, :show]
 
           resources :faq, only: [:index]
+
         end
       end
     end
