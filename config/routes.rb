@@ -1,20 +1,17 @@
 Rails.application.routes.draw do
-  use_doorkeeper
+  
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  root 'requests#index'
   # As we don’t need the app authorization, we can skip the authorizations and authorized_applications controller
   # We can also skip the applications controller, as users won’t be able to create or delete OAuth application
+  use_doorkeeper
+
   Rails.application.routes.draw do
-
-    use_doorkeeper do
-      skip_controllers :authorizations, :applications, :authorized_applications
-    end
-
-    devise_for :users, controllers: { registrations: 'users/registrations' }
-    
+    # use_doorkeeper do
+    #   skip_controllers :authorizations, :applications, :authorized_applications
+    # end
     namespace :api do
       namespace :v1 do
-        resources :users, only: [:destroy, :create]
+        resources :users, only: [:create]
         match '/users', to: 'users#show', via: %i[get]
         match '/users', to: 'users#destroy', via: %i[delete]
         match '/users', to: 'users#update', via: %i[put]
