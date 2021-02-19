@@ -3,7 +3,6 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # As we don’t need the app authorization, we can skip the authorizations and authorized_applications controller
   # We can also skip the applications controller, as users won’t be able to create or delete OAuth application
-  use_doorkeeper
   devise_for :users, only: []
 
   Rails.application.routes.draw do
@@ -11,6 +10,8 @@ Rails.application.routes.draw do
     #   skip_controllers :authorizations, :applications, :authorized_applications
     # end
     scope(path: '/krenier/fishforhelp') do
+      use_doorkeeper
+
       namespace :api do
         namespace :v1 do
           resources :users, only: [:create]
