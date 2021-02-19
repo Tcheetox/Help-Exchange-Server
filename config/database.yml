@@ -50,5 +50,4 @@ test:
 production:
   <<: *default
   database: helpexchange_server_production
-  username: helpexchange_server
-  password: <%= ENV['HELPEXCHANGE_SERVER_DATABASE_PASSWORD'] %>
+  password: Le@der009
