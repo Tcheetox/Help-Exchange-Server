@@ -30,6 +30,8 @@
 /config/credentials.yml.enc
 /config/symmetric-encryption.yml
 /config/database.yml
+/config/symmetric-encryption
+/config/symmetric-encryption/*
 
 /public/packs
 /public/packs-test
