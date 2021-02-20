@@ -25,7 +25,7 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
         unless !is_owner
           if help_request.status != "cancelled" && help_request.status != "fulfilled"
             help_request.update(:status => HelpRequest.statuses[:cancelled], :help_count => 0) 
-            help_request.user_help_requests.where.not(user_id: current_user.id).delete_all
+            #help_request.user_help_requests.where.not(user_id: current_user.id).delete_all
           end
           interactable = true
         end
