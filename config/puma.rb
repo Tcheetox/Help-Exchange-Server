@@ -14,7 +14,7 @@ port        ENV.fetch("HELPEXCHANGE_PORT") { 3000 }
 
 # Specifies the `environment` that Puma will run in.
 #
-environment ENV.fetch("HELPEXCHANGES_ENV") { "development" }
+environment ENV.fetch("HELPEXCHANGE_ENV") { "development" }
 
 # Specifies the `pidfile` that Puma will use.
 pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }

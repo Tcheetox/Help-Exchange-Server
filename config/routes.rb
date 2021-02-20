@@ -27,7 +27,7 @@ Rails.application.routes.draw do
           match '/help_requests/:id/:subaction', to: 'help_requests#update', via: %i[put]
           match '/help_requests/filter', to: 'help_requests#filter', via: %i[get]
 
-          mount ActionCable.server => '/users/:token/cable'
+          mount ActionCable.server => '/cable/:token'
           resources :conversations, only: [:index, :create, :show]
 
           resources :faq, only: [:index]

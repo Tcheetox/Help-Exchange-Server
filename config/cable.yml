@@ -6,5 +6,5 @@ test:
 
 production:
   adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
+  url: <%= ENV['HELPEXCHANGE_REDIS_URL'] %>:<%= ENV['HELPEXCHANGE_REDIS_PORT'] %>/<%= ENV['HELPEXCHANGE_REDIS_DB'] %>
   channel_prefix: helpexchange_server_production

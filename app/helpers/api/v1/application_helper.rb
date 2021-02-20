@@ -7,7 +7,7 @@ module Api::V1::ApplicationHelper
 
     def server_error(exception)
         Rails.logger.info("!!! #{exception}")
-        if ENV['HELPEXCHANGES_DEBUG'] == 'true'
+        if ENV['HELPEXCHANGE_DEBUG'] == 'true'
             render_error(50000, exception)
         else
             render_error(50000, "#{exception.backtrace.first}: #{exception.message} (#{exception.class})", exception.backtrace.drop(1).map{|s| "\t#{s}"})
