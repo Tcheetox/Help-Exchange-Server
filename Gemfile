@@ -13,10 +13,10 @@ gem 'rmagick'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
 # Use mysql as the database for Active Record
-#gem 'mysql2', '>= 0.4.4'
 gem 'mysql2', '~> 0.5.3'
 # Use Puma as the app server
 gem 'puma', '~> 4.1'
+
 # Use SCSS for stylesheets
 # gem 'sass-rails', '>= 6'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
@@ -25,21 +25,16 @@ gem 'puma', '~> 4.1'
 # gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
-#group :production do
-gem 'redis' #, '~> 3.3', '>= 3.3.1'
+
+gem 'redis' 
 gem 'redis-namespace'
 gem 'redis-rails'
-#end
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 4.0'
+
 # Use Active Model has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-# Use Active Storage variant
-# gem 'image_processing', '~> 1.2'
-
-# Reduces boot times through caching; required in config/boot.rb
-gem 'bootsnap', require: false
+# DOES NOT WORK because of permission denied - supposed to reduce boot times through caching; required in config/boot.rb
+#gem 'bootsnap', require: false
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
