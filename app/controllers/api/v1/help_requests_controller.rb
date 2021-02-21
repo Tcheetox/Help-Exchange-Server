@@ -11,9 +11,15 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
   # Requests associated to given user
   def filter
     current_user_help_requests = current_user.help_requests
-    details = UserHelpRequest.where(current_user_help_requests.ids.include?(:help_request_id)).joins(:user).select("user_help_requests.user_type, users.id, users.first_name, users.last_name")
+    details = UserHelpRequest.where(current_user_help_requests.ids.include?(:help_request_id)).joins(:user).select("user_help_requests.user_type, user_help_requests.help_request_id, users.id, users.first_name, users.last_name").to_a
     augmented_requests = []
-    current_user_help_requests.each do |cuhr| augmented_requests.push(cuhr.attributes.merge(:users => details.where(:help_request_id => cuhr.id))) end
+    current_user_help_requests.each do |cuhr| 
+      users_details =  []
+      details.each do |details| 
+        users_details << {:id => details.id, :user_type => details.user_type, :first_name => details.first_name, :last_name => details.last_name} if details.help_request_id == cuhr.id
+      end
+      augmented_requests.push(cuhr.attributes.merge(:users => users_details)) 
+    end
     render_response(200, augmented_requests)
   end  
 

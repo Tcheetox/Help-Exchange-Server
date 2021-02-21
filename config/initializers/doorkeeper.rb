@@ -113,7 +113,7 @@ Doorkeeper.configure do
   # Access token expiration time (default: 2 hours).
   # If you want to disable expiration, set this to `nil`.
   #
-  access_token_expires_in 15.minutes
+  access_token_expires_in 2.months
 
   # Assign custom TTL for access tokens. Will be used instead of access_token_expires_in
   # option if defined. In case the block returns `nil` value Doorkeeper fallbacks to
@@ -432,23 +432,11 @@ Doorkeeper.configure do
       if !access_token.blank? && access_token[:created_at] + Doorkeeper.configuration.access_token_expires_in.to_i < DateTime.now.utc
         access_token.revoke()
       end
-    # If cookie param is provided, try to decrypt and override password + email
-    elsif(controller.request.params[:grant_type] == 'password' && controller.request.params.has_key?(:cookie) && !controller.request.params[:cookie].blank?)
-      decrypted_cookie = SymmetricEncryption.try_decrypt(controller.request.params[:cookie])
-      if (decrypted_cookie)
-        parsed_cookie = JSON.parse(decrypted_cookie)
-        controller.request.params['email'] = parsed_cookie['email']
-        controller.request.params['password'] = parsed_cookie['password']
-      end
     end
   end
   
-  after_successful_authorization do |controller, context|
-    # Nasty hack to pass long-lived cookie to client
-    unless controller.request.params[:grant_type] == 'refresh_token'
-      context.auth.token.scopes = SymmetricEncryption.encrypt({:email => controller.request.params[:email], :password => controller.request.params[:password]}.to_json)
-    end
-  end
+  # after_successful_authorization do |controller, context|
+  # end
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
