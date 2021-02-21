@@ -15,7 +15,7 @@ class Api::V1::UsersStorageController < Api::V1::ApplicationController
                         begin
                             pdf = Magick::Image.from_blob(params[:file].read)
                             temp_file_name = "#{SecureRandom.hex}.jpg"
-                            temp_file_path = "tmp/#{temp_file_name}"
+                            temp_file_path = "tmp/thumbnails/#{temp_file_name}"
                             pdf.first.scale(600, 900).write(temp_file_path)
 
                             file = File.open(temp_file_path)
@@ -23,7 +23,7 @@ class Api::V1::UsersStorageController < Api::V1::ApplicationController
                             file.close
                             File.delete(temp_file_path)
                         rescue Exception => e
-                            server_error(e)
+                            Rails.logger.info("!!! #{e}")
                             current_user.tmp_gov_id.attach(params[:file])
                         end
                     else
