@@ -170,6 +170,7 @@ GEM
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
+    rmagick (4.2.1)
     rubyzip (2.3.0)
     selenium-webdriver (3.142.7)
       childprocess (>= 0.5, < 4.0)
@@ -224,6 +225,7 @@ DEPENDENCIES
   redis
   redis-namespace
   redis-rails
+  rmagick
   selenium-webdriver
   symmetric-encryption
   tzinfo-data

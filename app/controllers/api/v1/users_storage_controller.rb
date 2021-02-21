@@ -10,7 +10,26 @@ class Api::V1::UsersStorageController < Api::V1::ApplicationController
                     return render_error(40002)
                 else 
                     # Save the file as tmp
-                    current_user.tmp_gov_id.attach(params[:file])
+                    if File.extname(params[:file]).downcase === '.pdf'
+                        # Create PDF thumbnail > Save temp > ActiveStorage > Delete temp
+                        begin
+                            pdf = Magick::Image.from_blob(params[:file].read)
+                            temp_file_name = "#{SecureRandom.hex}.jpg"
+                            temp_file_path = "tmp/#{temp_file_name}"
+                            pdf.first.scale(600, 900).write(temp_file_path)
+
+                            file = File.open(temp_file_path)
+                            current_user.tmp_gov_id.attach(io: file, filename: temp_file_name, content_type: 'image/jpeg')
+                            file.close
+                            File.delete(temp_file_path)
+                        rescue Exception => e
+                            server_error(e)
+                            current_user.tmp_gov_id.attach(params[:file])
+                        end
+                    else
+                        current_user.tmp_gov_id.attach(params[:file])
+                    end
+
                     return render_response(201, :gov_id => url_for(current_user.tmp_gov_id))
                 end
             else return render_error(40003) end
