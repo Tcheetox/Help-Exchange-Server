@@ -30,15 +30,18 @@ class Api::V1::HelpRequestsController < Api::V1::ApplicationController
       when "cancel" # Owner only
         unless !is_owner
           if help_request.status != "cancelled" && help_request.status != "fulfilled"
-            help_request.update(:status => HelpRequest.statuses[:cancelled], :help_count => 0) 
+            help_request.update(:status => HelpRequest.statuses[:cancelled]) 
             #help_request.user_help_requests.where.not(user_id: current_user.id).delete_all
           end
           interactable = true
         end
       when "republish" # Owner only
         unless !is_owner
-          if help_request.status == "cancelled" || (help_request.status == "pending" && !help_request.pending_at.isblank? && DateTime.current - help_request.pending_at > 1.days)
-            help_request.update(:status => HelpRequest.statuses[:published])
+          if help_request.status == "cancelled" || (help_request.status == "pending" && !help_request.pending_at.blank? && (Time.now.utc - help_request.pending_at) > 1.days)
+            help_request.update(:status => HelpRequest.statuses[:published], :help_count => 0)
+            temp = help_request.attributes.merge({:users => help_request.user_help_requests.joins("INNER JOIN users ON users.id = #{current_user.id}").select("user_help_requests.user_type, users.id, users.first_name, users.last_name")})
+            help_request.users.where.not(id: current_user.id).each do |u| HelpRequestsChannel.broadcast_to(u, temp) end
+            help_request.user_help_requests.where.not(user_id: current_user.id).delete_all
           end
           interactable = true
         end

@@ -8,22 +8,23 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     end
 
     def update_without_password
-      verify_client_app
-      case user_params[:subaction].downcase
+      unless !client_app
+        case user_params[:subaction].downcase
 
-        when 'forgotten_password'
-          return render_error(40001) unless user_params.has_key?(:password) && user_params.has_key?(:reset_password_token) && (user ||= User.find_by(:reset_password_token => Devise.token_generator.digest(User,:reset_password_token, user_params[:reset_password_token])))
-          return render_error(40300) unless Devise.password_length.include?(user_params[:password].length)  
-          user.update(:password => user_params[:password])
-          return render_response(204)
-        
-        when 'confirm_account'
-          return render_error(40001) unless (user ||= User.find_by(:confirmation_token => user_params[:confirmation_token]))
-          user.update(:confirmed_at => DateTime.current)
-          return render_response(204)
-     
+          when 'forgotten_password'
+            return render_error(40001) unless user_params.has_key?(:password) && user_params.has_key?(:reset_password_token) && (user ||= User.find_by(:reset_password_token => Devise.token_generator.digest(User,:reset_password_token, user_params[:reset_password_token])))
+            return render_error(40300) unless Devise.password_length.include?(user_params[:password].length)  
+            user.update(:password => user_params[:password])
+            return render_response(204)
+          
+          when 'confirm_account'
+            return render_error(40001) unless (user ||= User.find_by(:confirmation_token => user_params[:confirmation_token]))
+            user.update(:confirmed_at => DateTime.current)
+            return render_response(204)
+      
+        end
+        return render_error(40001) 
       end
-      return render_error(40001) 
     end
 
     def update
@@ -52,19 +53,25 @@ class Api::V1::UsersController < Api::V1::ApplicationController
     def destroy # Soft delete
       current_user.update_attribute(:deleted_at, Time.current)
       current_user.update_attribute(:email, nil)
+      Doorkeeper::AccessToken.revoke_all_for(Doorkeeper::Application.find_by(uid: ENV['HELPEXCHANGE_APP_ID']).id, current_user)
       render_response(204)
     end
 
     def create
-      verify_client_app
-      return render_error(40001) unless !user_params[:email].blank?
-      user = User.new(email: user_params[:email], password: user_params[:password])
-      user.skip_confirmation_notification!
-      if user.save
-        Thread.new { user.send_confirmation_instructions }
-        render_response(201, {:message => 'User email must be confirmed to allow authentication'})
-      else # Email already in use
-        render_error(42201, user.errors.full_messages)
+      unless !client_app
+        return render_error(40001) unless !user_params[:email].blank?
+        user = User.new(email: user_params[:email], password: user_params[:password])
+        user.skip_confirmation_notification!
+        if user.save
+          if user.email.include? "@test.com" then
+            user.send_confirmation_instructions
+          else
+              Thread.new { user.send_confirmation_instructions }
+          end
+          render_response(201, {:message => 'User email must be confirmed to allow authentication'})
+        else # Email already in use
+          render_error(42201, user.errors.full_messages)
+        end
       end
     end
 
@@ -84,14 +91,6 @@ class Api::V1::UsersController < Api::V1::ApplicationController
       params.delete :user unless !params.has_key?(:user)
       params.permit(:email, :password, :subaction, :confirmation_token, :reset_password_token, :current_password, :first_name, :last_name, :phone, :post_code, :address, :country, :client_id, :client_secret, :gov_id, :lat, :lng)
     end
-
-    def generate_refresh_token
-      loop do
-        # Generate a random token string and return it, unless there is already another token with the same string
-        token = SecureRandom.hex(32)
-        break token unless Doorkeeper::AccessToken.exists?(refresh_token: token)
-      end
-    end 
   
     def user_profile
       gov_id_url = current_user.gov_id.blank? ? nil : url_for(current_user.gov_id)

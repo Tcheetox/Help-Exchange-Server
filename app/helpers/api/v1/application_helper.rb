@@ -1,8 +1,14 @@
 module Api::V1::ApplicationHelper
 
-    def verify_client_app
-        return render_error(40001) unless params.has_key?(:client_id) && params.has_key?(:client_secret)
-        return render_error(40000) unless (client_app ||= Doorkeeper::Application.find_by(uid: params[:client_id])) && client_app.secret == params[:client_secret]
+    def client_app
+        if !params.has_key?(:client_id) || !params.has_key?(:client_secret)
+            render_error(40001)
+            return false
+        elsif !(client_app ||= Doorkeeper::Application.find_by(uid: params[:client_id])) || client_app.secret != params[:client_secret]
+            render_error(40000) 
+            return false
+        end
+        return true
     end
 
     def server_error(exception)

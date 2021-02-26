@@ -9,11 +9,12 @@ Rails.application.routes.draw do
 
     scope(path: '/krenier/fishforhelp') do
       use_doorkeeper scope: 'api/v1/oauth' do
-        skip_controllers :authorizations, :applications, :authorized_applications
+        skip_controllers :authorizations, :applications, :authorized_applications, :token_info
       end
 
       namespace :api do
         namespace :v1 do
+          match '/oauth/sso', to: 'single_sign_on#create', via: %i[post]
 
           resources :users, only: [:create]
           match '/users', to: 'users#show', via: %i[get]
@@ -31,7 +32,6 @@ Rails.application.routes.draw do
           resources :conversations, only: [:index, :create, :show]
 
           resources :faq, only: [:index]
-
         end
       end
     end
