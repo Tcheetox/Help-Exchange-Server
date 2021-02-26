@@ -8,7 +8,7 @@
 # rails db:drop db:create db:migrate db:seed RAILS_ENV=test
 
 # The below might not be relevant in production
-if (Rails.env.development? || Rails.env.test?) && Doorkeeper::Application.count.zero?
+if Doorkeeper::Application.count.zero?
   Doorkeeper::Application.create(name: "REACT client", redirect_uri: "", scopes: "", uid: ENV['HELPEXCHANGE_APP_ID'], secret: ENV['HELPEXCHANGE_APP_SECRET'])
 end
 
@@ -22,70 +22,70 @@ if (Rails.env.development? || Rails.env.test?) && Faq.count.zero?
   Faq.create(question: "Can I ask for money?", response: "No! This platform must remain free of charges, both for its use and in its content. Any violations of our Terms and Services will lead to account suspension.", keywords: ["money", "terms and services", "chart","violation"])
 end
 
-if Rails.env.development? && User.count.zero?
+if (Rails.env.development? || Rails.env.production?)
   User.create!([
-    {email: "joe@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Joe", last_name: "Tanour", phone: "+32484789546", post_code: "1201", address: "Rue du Mont-Blanc 18", lat: 46.2085, lng: 6.14531, country: "Suisse", completed: true},
-    {email: "frank@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Frank", last_name: "Erzog", phone: "+32484789547", post_code: "1204", address: "Rue du Vieux-Collège 3", lat: 46.2019, lng: 6.15044, country: "Suisse", completed: true},
-    {email: "tony@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Tony", last_name: "Megalo", phone: "+32484789548", post_code: "1205", address: "Boulevard Carl-Vogt 21", lat: 46.1999, lng: 6.13279, country: "Suisse", completed: true},
-    {email: "myriam@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Myriam", last_name: "Malaimée", phone: "+32484789549", post_code: "1205", address: "Boulevard du Pont-d'Arve 40", lat: 46.1947, lng: 6.14035, country: "Suisse", completed: true},
-    {email: "coralie@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Coralie", last_name: "Dupuis", phone: "+32484789550", post_code: "1201", address: "Rue des Gares 16", lat: 46.2129, lng: 6.14191, country: "Suisse", completed: true},
-    {email: "julie@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Julie", last_name: "Van Delbossche", phone: "+32484789551", post_code: "1227", address: " Route des Acacias 8", lat: 46.1919, lng: 6.13756, country: "Suisse", completed: true}
+    {id: 101, email: "joe@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Joe", last_name: "Tanour", phone: "+32484789546", post_code: "1201", address: "Rue du Mont-Blanc 18", lat: 46.2085, lng: 6.14531, country: "Suisse", completed: true},
+    {id: 102, email: "frank@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Frank", last_name: "Erzog", phone: "+32484789547", post_code: "1204", address: "Rue du Vieux-Collège 3", lat: 46.2019, lng: 6.15044, country: "Suisse", completed: true},
+    {id: 103, email: "tony@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Tony", last_name: "Megalo", phone: "+32484789548", post_code: "1205", address: "Boulevard Carl-Vogt 21", lat: 46.1999, lng: 6.13279, country: "Suisse", completed: true},
+    {id: 104, email: "myriam@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Myriam", last_name: "Malaimée", phone: "+32484789549", post_code: "1205", address: "Boulevard du Pont-d'Arve 40", lat: 46.1947, lng: 6.14035, country: "Suisse", completed: true},
+    {id: 105, email: "coralie@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Coralie", last_name: "Dupuis", phone: "+32484789550", post_code: "1201", address: "Rue des Gares 16", lat: 46.2129, lng: 6.14191, country: "Suisse", completed: true},
+    {id: 106, email: "julie@gmail.com", password: "azerty", confirmed_at: "2021-02-20 09:17:54", confirmation_sent_at: "2021-02-20 09:17:44", first_name: "Julie", last_name: "Van Delbossche", phone: "+32484789551", post_code: "1227", address: " Route des Acacias 8", lat: 46.1919, lng: 6.13756, country: "Suisse", completed: true}
   ])
   HelpRequest.create!([
-    {title: "Tyre of my car", created_at: "2021-02-24 09:17:54", description: "I believe everything is in the title, can you help me with that?\nThe car is right in front of my house, its a Honda.\n\nThanks, Jo!", address: "Rue du Mont-Blanc 18, 1201 Suisse", lat: 46.2085, lng: 6.14531, status: "fulfilled", help_type: "immaterial", help_count: 1},
-    {title: "Heavy truck to unload", created_at: "2021-02-23 09:17:54", description: "Little help would be much appreciated because I have heavy furniture to unload whenever possible.\n\nThanks, Jo!", address: "Rue du Mont-Blanc 40, 1201 Suisse", lat: 46.2092, lng: 6.14306, status: "published", help_type: "material", help_count: 0},
-    {title: "Could you lend me a bbq?", created_at: "2021-02-22 09:17:54", description: "I plan to organize a BBQ next week at my friend's house.\nWould anyone help with that?\n\nThanks, Jo!", address: "Rue du Mont-Blanc 112, 1201 Suisse", lat: 46.2092, lng: 6.14306, status: "pending", pending_at: "2021-02-25 09:17:44", help_type: "material", help_count: 5},
-    {title: "Old man needs help for his lawn", created_at: "2021-02-24 09:17:54", description: "Hello dear friends,\n\nCould anyone help me with my lawn? I can't handle the grass anymore.\n\nF.", address: "Rue du Vieux-Collège 3, 1204 Suisse", lat: 46.2019, lng: 6.15044, status: "cancelled", help_type: "immaterial", help_count: 1},
-    {title: "Garage to clean up", created_at: "2021-02-25 09:17:54", description: "Hey, its Frank again!\n\nMy granddaughter left me with a heavy washing machine in my garage? Can you help me remove it?\nYou can take it home if you want.\n\nThanks,\nF.", address: "Rue du Vieux-Collège 12, 1204 Suisse", lat: 46.2014, lng: 6.1514, status: "published", help_type: "immaterial", help_count: 4},
-    {title: "Visitors are coming soon - do you have a table (outside) that you could rent?", created_at: "2021-02-25 09:17:54", description: "Hello community,\n\nI am hosting a tea party end of this month. The event will take place outside and I miss a table to serve food for my 20+ guests.\nCan anyone help?\n\nToto le zéro", address: "Boulevard Carl-Vogt 21, 1205 Suisse", lat: 46.1999, lng: 6.13279, status: "published", help_type: "material", help_count: 0},
-    {title: "My window is too high - need help and/or a huge ladder", created_at: "2021-02-26 09:17:54", description: "Hello,\n\nCan anyone help with that?\n\nThank you!!!!", address: "Boulevard du Pont-d'Arve 40, 1205 Suisse", lat: 46.1947, lng: 6.14035, status: "published", help_type: "immaterial", help_count: 0},
-    {title: "I don't understand Math", created_at: "2021-02-24 09:17:54", description: "Hi fellows,\n\nWe recently started trigonometry at school and I don't understand shit.\nCan one of you neighbor help me?\n\nYayyy! \n\nThanks, Co.", address: "Rue des Gares 16, 1201 Suisse", lat: 46.2129, lng: 6.14191, status: "published", help_type: "immaterial", help_count: 2}
+    {id: 101, title: "Tyre of my car", created_at: "2021-02-24 09:17:54", description: "I believe everything is in the title, can you help me with that?\nThe car is right in front of my house, its a Honda.\n\nThanks, Jo!", address: "Rue du Mont-Blanc 18, 1201 Suisse", lat: 46.2085, lng: 6.14531, status: "fulfilled", help_type: "immaterial", help_count: 1},
+    {id: 102, title: "Heavy truck to unload", created_at: "2021-02-23 09:17:54", description: "Little help would be much appreciated because I have heavy furniture to unload whenever possible.\n\nThanks, Jo!", address: "Rue du Mont-Blanc 40, 1201 Suisse", lat: 46.2092, lng: 6.14306, status: "published", help_type: "material", help_count: 0},
+    {id: 103, title: "Could you lend me a bbq?", created_at: "2021-02-22 09:17:54", description: "I plan to organize a BBQ next week at my friend's house.\nWould anyone help with that?\n\nThanks, Jo!", address: "Rue du Mont-Blanc 112, 1201 Suisse", lat: 46.2092, lng: 6.14306, status: "pending", pending_at: "2021-02-25 09:17:44", help_type: "material", help_count: 5},
+    {id: 104, title: "Old man needs help for his lawn", created_at: "2021-02-24 09:17:54", description: "Hello dear friends,\n\nCould anyone help me with my lawn? I can't handle the grass anymore.\n\nF.", address: "Rue du Vieux-Collège 3, 1204 Suisse", lat: 46.2019, lng: 6.15044, status: "cancelled", help_type: "immaterial", help_count: 1},
+    {id: 105, title: "Garage to clean up", created_at: "2021-02-25 09:17:54", description: "Hey, its Frank again!\n\nMy granddaughter left me with a heavy washing machine in my garage? Can you help me remove it?\nYou can take it home if you want.\n\nThanks,\nF.", address: "Rue du Vieux-Collège 12, 1204 Suisse", lat: 46.2014, lng: 6.1514, status: "published", help_type: "immaterial", help_count: 4},
+    {id: 106, title: "Visitors are coming soon - do you have a table (outside) that you could rent?", created_at: "2021-02-25 09:17:54", description: "Hello community,\n\nI am hosting a tea party end of this month. The event will take place outside and I miss a table to serve food for my 20+ guests.\nCan anyone help?\n\nToto le zéro", address: "Boulevard Carl-Vogt 21, 1205 Suisse", lat: 46.1999, lng: 6.13279, status: "published", help_type: "material", help_count: 0},
+    {id: 107, title: "My window is too high - need help and/or a huge ladder", created_at: "2021-02-26 09:17:54", description: "Hello,\n\nCan anyone help with that?\n\nThank you!!!!", address: "Boulevard du Pont-d'Arve 40, 1205 Suisse", lat: 46.1947, lng: 6.14035, status: "published", help_type: "immaterial", help_count: 0},
+    {id: 108, title: "I don't understand Math", created_at: "2021-02-24 09:17:54", description: "Hi fellows,\n\nWe recently started trigonometry at school and I don't understand shit.\nCan one of you neighbor help me?\n\nYayyy! \n\nThanks, Co.", address: "Rue des Gares 16, 1201 Suisse", lat: 46.2129, lng: 6.14191, status: "published", help_type: "immaterial", help_count: 2}
   ])
   UserHelpRequest.create!([
-    {user_id: 1, help_request_id: 1, user_type: "owner"},
-    {user_id: 1, help_request_id: 2, user_type: "owner"},
-    {user_id: 1, help_request_id: 3, user_type: "owner"},
-    {user_id: 2, help_request_id: 4, user_type: "owner"},
-    {user_id: 2, help_request_id: 5, user_type: "owner"},
-    {user_id: 2, help_request_id: 3, user_type: "respondent"},
-    {user_id: 3, help_request_id: 4, user_type: "respondent"},
-    {user_id: 3, help_request_id: 5, user_type: "respondent"},
-    {user_id: 3, help_request_id: 3, user_type: "respondent"},
-    {user_id: 3, help_request_id: 1, user_type: "respondent"},
-    {user_id: 3, help_request_id: 6, user_type: "owner"},
-    {user_id: 4, help_request_id: 7, user_type: "owner"},
-    {user_id: 4, help_request_id: 5, user_type: "respondent"},
-    {user_id: 4, help_request_id: 3, user_type: "respondent"},
-    {user_id: 4, help_request_id: 4, user_type: "respondent"},
-    {user_id: 5, help_request_id: 8, user_type: "owner"},
-    {user_id: 5, help_request_id: 5, user_type: "respondent"},
-    {user_id: 5, help_request_id: 3, user_type: "respondent"},
-    {user_id: 6, help_request_id: 8, user_type: "respondent"},
-    {user_id: 6, help_request_id: 5, user_type: "respondent"},
-    {user_id: 6, help_request_id: 3, user_type: "respondent"},
-    {user_id: 1, help_request_id: 8, user_type: "respondent"},
+    {user_id: 101, help_request_id: 101, user_type: "owner"},
+    {user_id: 101, help_request_id: 102, user_type: "owner"},
+    {user_id: 101, help_request_id: 103, user_type: "owner"},
+    {user_id: 102, help_request_id: 104, user_type: "owner"},
+    {user_id: 102, help_request_id: 105, user_type: "owner"},
+    {user_id: 102, help_request_id: 103, user_type: "respondent"},
+    {user_id: 103, help_request_id: 104, user_type: "respondent"},
+    {user_id: 103, help_request_id: 105, user_type: "respondent"},
+    {user_id: 103, help_request_id: 103, user_type: "respondent"},
+    {user_id: 103, help_request_id: 101, user_type: "respondent"},
+    {user_id: 103, help_request_id: 106, user_type: "owner"},
+    {user_id: 104, help_request_id: 107, user_type: "owner"},
+    {user_id: 104, help_request_id: 105, user_type: "respondent"},
+    {user_id: 104, help_request_id: 103, user_type: "respondent"},
+    {user_id: 104, help_request_id: 104, user_type: "respondent"},
+    {user_id: 105, help_request_id: 108, user_type: "owner"},
+    {user_id: 105, help_request_id: 105, user_type: "respondent"},
+    {user_id: 105, help_request_id: 103, user_type: "respondent"},
+    {user_id: 106, help_request_id: 108, user_type: "respondent"},
+    {user_id: 106, help_request_id: 105, user_type: "respondent"},
+    {user_id: 106, help_request_id: 103, user_type: "respondent"},
+    {user_id: 101, help_request_id: 108, user_type: "respondent"},
   ])
   Conversation.create!([
-    {help_request_id: 3, owner_user_id: 1, respondent_user_id: 2},
-    {help_request_id: 1, owner_user_id: 1, respondent_user_id: 3}
+    {id: 101, help_request_id: 103, owner_user_id: 101, respondent_user_id: 102},
+    {id: 102, help_request_id: 101, owner_user_id: 101, respondent_user_id: 103}
   ])
   Message.create!([
-    {message: "Hi Joe, I have a BBQ you can pick it up at my place. Let me know. F.", conversation_id: 1, user_id: 2, status: "read"},
-    {message: "Hi Joe, I am mechanical engineer I can help with your tyre. I also have the tools.", conversation_id: 2, user_id: 3, status: "read"},
-    {message: "That would be great!", conversation_id: 2, user_id: 1, status: "unread"},
-    {message: "Awesome, I'll contact you again soon.", conversation_id: 1, user_id: 1, status: "read"},
-    {message: "Thanks for your help btw, I mark the request as fulfilled.", conversation_id: 2, user_id: 1, status: "unread"}
+    {id: 101, message: "Hi Joe, I have a BBQ you can pick it up at my place. Let me know. F.", conversation_id: 101, user_id: 102, status: "read"},
+    {id: 102, message: "Hi Joe, I am mechanical engineer I can help with your tyre. I also have the tools.", conversation_id: 102, user_id: 103, status: "read"},
+    {id: 103, message: "That would be great!", conversation_id: 102, user_id: 101, status: "unread"},
+    {id: 104, message: "Awesome, I'll contact you again soon.", conversation_id: 101, user_id: 101, status: "read"},
+    {id: 105, message: "Thanks for your help btw, I mark the request as fulfilled.", conversation_id: 102, user_id: 101, status: "unread"}
   ])
   ActiveStorage::Blob.create!([
-    {key: "1di1z2xcl7irocf2byh94yptlu6p", filename: "512.jpg", content_type: "image/jpeg", metadata: {"identified"=>true, "analyzed"=>true}, byte_size: 28841, checksum: "hpf5CMiK78aDB5opCmhSxg=="}
+    {id:101, key: "1di1z2xcl7irocf2byh94yptlu6p", filename: "512.jpg", content_type: "image/jpeg", metadata: {"identified"=>true, "analyzed"=>true}, byte_size: 28841, checksum: "hpf5CMiK78aDB5opCmhSxg=="}
   ])
   ActiveStorage::Attachment.create!([
-    {name: "gov_id", record_type: "User", record_id: 1, blob_id: 1},
-    {name: "gov_id", record_type: "User", record_id: 2, blob_id: 1},
-    {name: "gov_id", record_type: "User", record_id: 3, blob_id: 1},
-    {name: "gov_id", record_type: "User", record_id: 4, blob_id: 1},
-    {name: "gov_id", record_type: "User", record_id: 5, blob_id: 1},
-    {name: "gov_id", record_type: "User", record_id: 6, blob_id: 1},
+    {id: 101, name: "gov_id", record_type: "User", record_id: 101, blob_id: 101},
+    {id: 102, name: "gov_id", record_type: "User", record_id: 102, blob_id: 101},
+    {id: 103, name: "gov_id", record_type: "User", record_id: 103, blob_id: 101},
+    {id: 104, name: "gov_id", record_type: "User", record_id: 104, blob_id: 101},
+    {id: 105, name: "gov_id", record_type: "User", record_id: 105, blob_id: 101},
+    {id: 106, name: "gov_id", record_type: "User", record_id: 106, blob_id: 101},
   ])
 end
 
