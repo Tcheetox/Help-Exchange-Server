@@ -1,0 +1,9 @@
+Welcome <%= @email %>,
+
+You can confirm your account through the below link:
+<%= "#{ENV['HELPEXCHANGE_FRONTEND_ROOT_URL']}/users/login/#{@token}" %>
+
+We are excited to have you on board!
+
+Kind regards,
+The FishForHelp team
