@@ -20,7 +20,11 @@ module HelpexchangeServer
     config.api_only = true
     config.debug_exception_response_format = :default
     config.load_defaults 6.0
-    config.autoloader = :classic
+    
+   # config.autoloader = :classic
+    config.time_zone = "Europe/Brussels"
+    config.active_record.default_timezone = "Europe/Brussels"
+
     config.autoload_paths << "#{Rails.root}/lib/assets"
 
     # Settings in config/environments/* take precedence over those specified here.
