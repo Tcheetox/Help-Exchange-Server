@@ -12,16 +12,16 @@ class Api::V1::UsersMailerController < Api::V1::ApplicationController
                     case params[:subaction].downcase
                         when 'forgot_password'
                             if user.email.include? "@test.com" then
-                                user.send_reset_password_instructions
+                                send_mail(user, :reset_password)
                             else
-                                Thread.new { user.send_reset_password_instructions }
+                                Thread.new { send_mail(user, :reset_password) }
                             end
                             return render_response(201, {:message => 'Reset password instructions sent by email'})
                         when 'send_confirmation'
                             if user.email.include? "@test.com" then
-                                user.send_confirmation_instructions
+                                send_mail(user, :send_confirmation)
                             else
-                                Thread.new { user.send_confirmation_instructions }
+                                Thread.new { send_mail(user, :send_confirmation) }
                             end
                             return render_response(201, {:message => 'Account confirmation sent by email'})
                     end

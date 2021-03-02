@@ -17,6 +17,10 @@ gem 'mysql2', '~> 0.5.3'
 gem 'puma', '~> 4.1'
 # Google SSO
 gem 'google_sign_in'
+#gem 'google-api-client'
+gem 'google-apis-gmail_v1'
+gem 'googleauth'
+gem 'mail'
 
 # Use SCSS for stylesheets
 # gem 'sass-rails', '>= 6'

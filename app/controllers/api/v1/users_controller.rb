@@ -12,7 +12,7 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         case user_params[:subaction].downcase
 
           when 'forgotten_password'
-            return render_error(40001) unless user_params.has_key?(:password) && user_params.has_key?(:reset_password_token) && (user ||= User.find_by(:reset_password_token => Devise.token_generator.digest(User,:reset_password_token, user_params[:reset_password_token])))
+            return render_error(40001) unless user_params.has_key?(:password) && user_params.has_key?(:reset_password_token) && (user ||= User.find_by(:reset_password_token => user_params[:reset_password_token]))
             return render_error(40300) unless Devise.password_length.include?(user_params[:password].length)  
             user.update(:password => user_params[:password])
             return render_response(204)
@@ -64,9 +64,9 @@ class Api::V1::UsersController < Api::V1::ApplicationController
         user.skip_confirmation_notification!
         if user.save
           if user.email.include? "@test.com" then
-            user.send_confirmation_instructions
+            send_mail(user, :send_confirmation)
           else
-              Thread.new { user.send_confirmation_instructions }
+            Thread.new { send_mail(user, :send_confirmation) }  
           end
           render_response(201, {:message => 'User email must be confirmed to allow authentication'})
         else # Email already in use

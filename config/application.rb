@@ -3,9 +3,12 @@ require_relative 'boot'
 require 'rails' 
 require 'active_storage/engine'
 require 'action_controller/railtie'
-require 'action_mailer/railtie'
+# require 'action_mailer/railtie'
 require 'action_cable/engine'
 require 'rmagick'
+
+require 'google/apis/gmail_v1'
+gmail = Google::Apis::GmailV1::GmailService.new
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

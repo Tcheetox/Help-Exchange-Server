@@ -76,12 +76,72 @@ module Api::V1::ApplicationHelper
         return true
     end
 
+    def send_mail(user, type)
+
+        # Google auth through service account with domain-wide delegation
+        authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+        json_key_io: File.open('config/google_gmail_key.json'),
+        scope: 'https://mail.google.com/')
+        gmail = Google::Apis::GmailV1::GmailService.new
+        gmail.authorization = authorizer.dup
+        gmail.authorization.sub = ENV['HELPEXCHANGE_MAILER_USERNAME']
+
+        # Generate token and associate it to provided user
+        if type == :reset_password 
+            raw, hashed = Devise.token_generator.generate(User, :reset_password_token)
+            user.reset_password_token = hashed
+            user.reset_password_sent_at = Time.now.utc
+            user.save
+        else
+            raw, hashed = Devise.token_generator.generate(User, :confirmation_token)
+            user.confirmation_token = hashed
+            user.confirmation_sent_at = Time.now.utc
+            user.save
+        end
+
+        # Build mail
+        mail = Mail.new
+        mail.subject = type == :reset_password ? "Fish For Help: reset your password" : "Fish For Help: confirm your account"
+        mail.from = ENV['HELPEXCHANGE_MAILER_SENDER']
+        mail.to = user.email
+        mail.content_type = "text/html"
+        mail.body = build_mail_body(user, type, type == :reset_password ? user.reset_password_token : user.confirmation_token)
+        message_object = Google::Apis::GmailV1::Message.new(raw:mail.to_s)
+        gmail.send_user_message('me', message_object)
+
+    end
+
     private 
 
     def render_json(statusCode, body)
         render :json => body, :status => statusCode,
             :content_type => 'application/json',
             :layout => false
+    end
+
+    def build_mail_body(user, type, token)
+        if type == :reset_password
+            return "Hello #{user.first_name.blank? ? user.email : user.first_name},
+                <br/> <br/>
+                Someone has requested to change your password. You can do this through the below link: <br/>
+                #{ENV['HELPEXCHANGE_FRONTEND_ROOT_URL']}/users/troubleshoot/reset/#{token}
+                <br/> <br/>
+                Note that your password won't change until you access this link and create a new one. <br/>
+                If you are not the author of this request, please ignore this email.
+                <br/> <br/>
+                Kind regards, <br/>
+                The FishForHelp team"
+        elsif type == :send_confirmation
+            return "Welcome #{user.email},
+                <br/> <br/>
+                You can confirm your account through the below link:<br/>
+                #{ENV['HELPEXCHANGE_FRONTEND_ROOT_URL']}/users/login/#{token}
+                <br/> <br/>
+                We are excited to have you on board!
+                <br/> <br/>
+                Kind regards, <br/>
+                The FishForHelp team"
+        end
     end
 
 end
