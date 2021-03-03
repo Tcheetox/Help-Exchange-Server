@@ -22,7 +22,7 @@ module HelpexchangeServer
     config.load_defaults 6.0
     
     config.time_zone = "Europe/Brussels"
-    config.active_record.default_timezone = "Europe/Brussels"
+    config.active_record.default_timezone = :local
 
     config.autoload_paths << "#{Rails.root}/lib/assets"
 
