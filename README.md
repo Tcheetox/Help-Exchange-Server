@@ -7,12 +7,12 @@ The goal is to **Build and aid platform for your neighborhood**. It requires a b
 
 Deliver a complete solution including both front-end and back-end that allows:
 
-- Users to sign-up and log-in
-- Users profile management
-- Submitting a help request
-- Participate in help requests
-- Communication workflow between request creators and participants
-- Display help requests on a map
+1. Users sign-up and log-in
+2. Users profile management
+3. Submitting a help request
+4. Participate in help requests
+5. Communication workflow between request creators and participants
+6. Display help requests on a map
 
 ## Content
 
