@@ -3,8 +3,6 @@
 This project represents the final piece of the Full-Stack developer path proposed by [OpenClassrooms](https://openclassrooms.com).
 The goal is to **Build and aid platform for your neighborhood**. It requires a broad(er) range of features, such as real-time communication, automated testing, and external APIs usage.
 
-[Browse the result](https://thekecha.com/krenier/fishforhelp)
-
 ## Objective
 
 Deliver a complete solution including both front-end and back-end that allows:
