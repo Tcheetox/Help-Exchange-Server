@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Api::V1::UsersController, type: :request do
 
     header_auth = { :Authorization => "Bearer #{get_user_access_token("profile_user_seed@test.com")}" }
-    users_route = "/krenier/fishforhelp/api/v1/users"
+    users_route = "/fishforhelp/api/v1/users"
 
     # GET - User profile
     it "returns user profile" do

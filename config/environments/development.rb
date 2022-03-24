@@ -30,7 +30,7 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
-  config.active_storage.routes_prefix = '/krenier/fishforhelp/api/v1/users/edit'
+  config.active_storage.routes_prefix = '/fishforhelp/api/v1/users/edit'
 
   # Mailer stuff
   # config.action_mailer.perform_caching = false

@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 
   Rails.application.routes.draw do
 
-    scope(path: '/krenier/fishforhelp') do
+    scope(path: '/fishforhelp') do
       use_doorkeeper scope: 'api/v1/oauth' do
         skip_controllers :authorizations, :applications, :authorized_applications, :token_info
       end

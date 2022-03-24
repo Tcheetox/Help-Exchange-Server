@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Api::V1::UsersMailerController, type: :request do
 
     request_params = add_app_params({:email => "profile_user_seed@test.com"})
-    users_mailer_route_prefix = "/krenier/fishforhelp/api/v1/users/mailer"
+    users_mailer_route_prefix = "/fishforhelp/api/v1/users/mailer"
 
     # POST - Send email
     it "send account confirmation" do
