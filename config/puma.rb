@@ -5,7 +5,7 @@
 # and maximum; this matches the default thread size of Active Record.
 #
 workers 1
-max_threads_count = 3
+max_threads_count = 2
 min_threads_count = 1
 threads min_threads_count, max_threads_count
 
