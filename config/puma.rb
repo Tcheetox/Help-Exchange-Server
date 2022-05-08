@@ -4,10 +4,10 @@
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
 #
-#workers 1
-#max_threads_count = 1
-#min_threads_count = 1
-#threads min_threads_count, max_threads_count
+workers 1
+max_threads_count = 1
+min_threads_count = 1
+threads min_threads_count, max_threads_count
 
 set_default_host '127.0.0.1'
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
