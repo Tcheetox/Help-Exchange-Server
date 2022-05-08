@@ -4,10 +4,10 @@
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
 #
-workers 1
-max_threads_count = 1
-min_threads_count = 1
-threads min_threads_count, max_threads_count
+#workers 1
+#max_threads_count = 1
+#min_threads_count = 1
+#threads min_threads_count, max_threads_count
 
 set_default_host '127.0.0.1'
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
@@ -24,7 +24,7 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 # Workers do not work on JRuby or Windows (both of which do not support
 # processes).
 #
-# workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+workers ENV.fetch("WEB_CONCURRENCY") { 0 }
 
 # Use the `preload_app!` method when specifying a `workers` number.
 # This directive tells Puma to first boot the application and load code
