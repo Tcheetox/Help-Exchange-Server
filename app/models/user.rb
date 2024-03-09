@@ -18,9 +18,7 @@ class User < ApplicationRecord
     puts user.confirmed?
     puts user.valid_password?(password)
     puts !user.deleted_at?
-    ok = user && user.confirmed? && user.valid_password?(password) && !user.deleted_at? ? user : nil
-    puts ok
-    return true
+    user && user.confirmed? && user.valid_password?(password) && !user.deleted_at? ? user : nil
   end
 
 end
