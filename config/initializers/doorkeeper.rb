@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use (requires ORM extensions installed).
   # Check the list of supported ORMs here: https://github.com/doorkeeper-gem/doorkeeper#orms
@@ -505,12 +504,6 @@ Doorkeeper.configure do
   # realm "Doorkeeper"
 end
 
-module CustomTokenResponse
-  def body
-      user = User.find(@token.resource_owner_id)
-      # call original `#body` method and merge its result with the additional data hash
-      super.merge({:id => user.id, :email => user.email, :completed => user.completed})
-  end
+Rails.application.config.to_prepare do
+  Doorkeeper::OAuth::TokenResponse.send :prepend, CustomTokenResponse
 end
-
-Doorkeeper::OAuth::TokenResponse.send :prepend, CustomTokenResponse
