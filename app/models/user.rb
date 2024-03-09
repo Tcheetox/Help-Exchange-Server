@@ -11,13 +11,7 @@ class User < ApplicationRecord
 
   # The authenticate method from devise documentation
   def self.authenticate(email, password)
-    puts "USER AUTH"
     user = User.find_for_authentication(email: email)
-    puts email
-    puts password
-    puts user.confirmed?
-    puts user.valid_password?(password)
-    puts !user.deleted_at?
     user && user.confirmed? && user.valid_password?(password) && !user.deleted_at? ? user : nil
   end
 

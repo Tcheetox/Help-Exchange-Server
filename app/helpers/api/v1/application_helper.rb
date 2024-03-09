@@ -5,7 +5,6 @@ module Api::V1::ApplicationHelper
             render_error(40001)
             return false
         elsif !(client_app ||= Doorkeeper::Application.find_by(uid: params[:client_id])) || client_app.secret != params[:client_secret]
-            puts "NOT THE PROPER CLIENT APP"
             render_error(40000) 
             return false
         end

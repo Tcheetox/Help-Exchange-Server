@@ -12,7 +12,7 @@ if Doorkeeper::Application.count.zero?
   Doorkeeper::Application.create(name: "REACT client", redirect_uri: "", scopes: "", uid: ENV['HELPEXCHANGE_APP_ID'], secret: ENV['HELPEXCHANGE_APP_SECRET'])
 end
 
-if (Rails.env.development? || Rails.env.test?) && Faq.count.zero?
+if Faq.count.zero?
   Faq.create(question: "How to delete my account?", response: "You can delete your account at anytime using your profile configuration page.", keywords: ["delete my account", "remove", "quit"])
   Faq.create(question: "I had an issue while helping someone, what should I do?", response: "Contact our support by email so we can take necessary measures if needed.", keywords: ["issues", "support", "email"])
   Faq.create(question: "I created an account but I cannot help and/or ask for assistance, why?", response: "Before using our services your profile must be complete. You can complete it in your profile configuration page.", keywords:["complete profile"])
