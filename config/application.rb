@@ -5,7 +5,7 @@ require 'active_storage/engine'
 require 'action_controller/railtie'
 require 'action_mailer/railtie'
 require 'action_cable/engine'
-require 'rmagick'
+#require 'rmagick'
 
 require 'google/apis/gmail_v1'
 gmail = Google::Apis::GmailV1::GmailService.new
