@@ -1,4 +1,6 @@
 Rails.application.configure do
+  puts ">>> PRODUCTION ENVIRONMENT"
+  
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts << 'thekecha.com'
   # Code is not reloaded between requests.
