@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.2'
+ruby '3.3.0'
 
 # Authentication and Users
 gem 'devise', '>= 4.8'
@@ -9,7 +8,7 @@ gem 'doorkeeper', '>= 5.4'
 gem 'rack-cors', '>= 1.1.1'
 gem 'figaro', '>= 1.2.0'
 # First install necessary dependencies 'sudo apt-get install libmagickwand-dev'
-gem 'rmagick', '>= 4.2.3' 
+gem 'rmagick', '>= 5.3.0' 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '>= 6.1.4.1'
 # Use mysql as the database for Active Record
