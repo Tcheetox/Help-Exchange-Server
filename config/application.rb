@@ -24,7 +24,7 @@ module HelpexchangeServer
     config.time_zone = "Europe/Brussels"
     config.active_record.default_timezone = :local
 
-    config.autoload_paths << "#{Rails.root}/lib/assets"
+    config.autoload_paths << Rails.root.join('lib', 'assets')
 
     if Rails.env.production?
       config.autoloader = :classic
