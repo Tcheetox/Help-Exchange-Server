@@ -10,6 +10,11 @@ Doorkeeper.configure do
     User.authenticate(params[:email], params[:password])
   end
 
+  custom_access_token_response = CustomTokenResponse
+
+  # Use custom token response class
+  access_token_generator custom_access_token_response
+  
   # Enable password grant
   grant_flows %w[password]
 
@@ -505,4 +510,4 @@ Doorkeeper.configure do
   # realm "Doorkeeper"
 end
 
-Doorkeeper::OAuth::TokenResponse.send :prepend, CustomTokenResponse
+#Doorkeeper::OAuth::TokenResponse.send :prepend, CustomTokenResponse
