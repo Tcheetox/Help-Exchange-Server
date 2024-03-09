@@ -13,7 +13,6 @@ class User < ApplicationRecord
   def self.authenticate(email, password)
     puts "USER AUTH"
     user = User.find_for_authentication(email: email)
-    puts user.confirmed
     puts email
     puts password
     puts user.confirmed?
