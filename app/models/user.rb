@@ -13,8 +13,9 @@ class User < ApplicationRecord
   def self.authenticate(email, password)
     puts "USER AUTH"
     user = User.find_for_authentication(email: email)
-    puts user
-    user && user.confirmed? && user.valid_password?(password) && !user.deleted_at? ? user : nil
+    ok = user && user.confirmed? && user.valid_password?(password) && !user.deleted_at? ? user : nil
+    puts ok
+    return ok
   end
 
 end

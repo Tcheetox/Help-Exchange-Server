@@ -1,4 +1,5 @@
 module CustomTokenResponse
+    puts "CUSTOM TOKENARD"
     def body
         user = User.find(@token.resource_owner_id)
         puts "USER FOUND"
