@@ -23,9 +23,6 @@ RUN bundle install
 # Copy the rest of the application code
 COPY . .
 
-# Precompile assets
-RUN bundle exec rake assets:precompile
-
 # Expose port 4003 to the Docker host
 EXPOSE 4003
 
