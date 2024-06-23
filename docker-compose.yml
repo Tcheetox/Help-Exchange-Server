@@ -1,0 +1,20 @@
+services:
+  help-exchange-server:
+    restart: always
+    build:
+        context: .
+        dockerfile: Dockerfile
+    command: bundle exec rails s -p 4003 -e production
+    ports:
+      - '4003:4003'
+    environment:
+      - RAILS_ENV=production
+    volumes:
+      - /var/docker/help-exchange-server/data:/data
+    networks:
+      - mariadb_mariadb_network
+
+networks:
+  mariadb_mariadb_network:
+    external: true
+    driver: bridge

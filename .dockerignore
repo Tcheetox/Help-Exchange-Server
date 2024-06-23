@@ -1,0 +1,59 @@
+# Ignore bundler config
+/.bundle
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore uploaded files in development
+/storage/*
+!/storage/.keep
+
+# Ignore development & test databases
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+# Ignore all files in the node_modules directory
+/node_modules
+
+# Ignore Yarn files
+/yarn-error.log
+/yarn-debug.log*
+/.pnp
+.pnp.js
+
+# Ignore dotenv files
+.env
+.env.*
+
+# Ignore byebug command history file.
+.byebug_history
+
+# Ignore system and editor-specific files
+**/.DS_Store
+**/Thumbs.db
+
+# Ignore IDE directories
+/.idea
+.project
+*.iml
+
+# Ignore coverage directory
+/coverage
+
+# Ignore other unneeded files
+/public/assets
+/public/packs
+/public/packs-test
+/public/packs-dev
+/public/system
+/public/uploads
+
+# Ignore vendor cache
+/vendor/cache
+
+# Ignore Docker-specific files
+Dockerfile
+docker-compose.yml
