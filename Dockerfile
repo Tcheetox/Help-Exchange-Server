@@ -6,7 +6,7 @@ ENV RAILS_ENV=production
 ENV RAILS_LOG_TO_STDOUT=true
 
 # Install necessary dependencies
-RUN apt-get update -qq && apt-get install -y nodejs mariadb-client libmariadb-dev yarn libmagickwand-dev
+RUN apt-get update -qq && apt-get install -y nodejs mariadb-client libmariadb-dev yarn libmagickwand-dev redis-tools
 
 # Set up working directory
 WORKDIR /app
