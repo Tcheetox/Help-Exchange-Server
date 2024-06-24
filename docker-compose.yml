@@ -13,6 +13,7 @@ services:
       - /var/docker/help-exchange-server/data:/data
     networks:
       - mariadb_mariadb_network
+      - redis_redis_network
 
 networks:
   mariadb_mariadb_network:
