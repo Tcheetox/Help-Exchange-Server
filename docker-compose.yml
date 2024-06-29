@@ -1,6 +1,7 @@
 services:
   help-exchange-server:
     restart: always
+    container_name: help-exchange
     build:
         context: .
         dockerfile: Dockerfile
