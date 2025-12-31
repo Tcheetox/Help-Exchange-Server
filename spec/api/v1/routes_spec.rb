@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Routes', :type => :routing do
 
     api_version = "api/v1"
-    routes_prefix = "fishforhelp/#{api_version}"
+    routes_prefix = api_version
 
     # FAQ
     it "#{routes_prefix}/faq to #{api_version}/faq#index" do

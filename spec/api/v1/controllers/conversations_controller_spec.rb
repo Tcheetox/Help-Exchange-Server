@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::ConversationsController, type: :request do
 
-conversations_route = "/fishforhelp/api/v1/conversations"
+conversations_route = "/api/v1/conversations"
 
     outsider_header_auth = { :Authorization => "Bearer #{get_user_access_token("unrelated_user_seed@test.com")}" }
     existing_respondent = User.find_by(:email => "respondent_user_seed@test.com")

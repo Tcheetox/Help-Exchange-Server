@@ -1,12 +1,14 @@
 # Use the official Ruby image
-FROM ruby:3.3.0
+FROM ruby:3.3.0-slim
 
 # Set environment variables
 ENV RAILS_ENV=production
 ENV RAILS_LOG_TO_STDOUT=true
 
 # Install necessary dependencies
-RUN apt-get update -qq && apt-get install -y nodejs mariadb-client libmariadb-dev yarn libmagickwand-dev
+RUN apt-get update -qq && apt-get install -y nodejs mariadb-client libmariadb-dev yarn libmagickwand-dev \
+    yarn \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
 WORKDIR /app
@@ -23,8 +25,8 @@ RUN bundle install
 # Copy the rest of the application code
 COPY . .
 
-# Expose port 4003 to the Docker host
-EXPOSE 4003
+# Expose port to the host
+EXPOSE 5005
 
 # Start the Rails server
-CMD ["bundle", "exec", "rails", "server", "-p", "4003"]
+CMD ["bundle", "exec", "rails", "server", "-p", "5005"]

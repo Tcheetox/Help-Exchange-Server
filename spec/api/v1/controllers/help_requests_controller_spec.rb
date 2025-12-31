@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::HelpRequestsController, type: :request do
 
-    help_requests_route = "/fishforhelp/api/v1/help_requests"
+    help_requests_route = "/api/v1/help_requests"
 
     owner_header_auth = { :Authorization => "Bearer #{get_user_access_token("owner_user_seed@test.com")}" }
     owner_help_request_params = {:help_type => 'material', :title => 'title', :description => 'description', :address => "address", :lat => 0, :lng => 0}

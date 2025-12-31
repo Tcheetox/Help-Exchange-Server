@@ -5,13 +5,13 @@ services:
     build:
         context: .
         dockerfile: Dockerfile
-    command: bundle exec rails s -p 4003 -e production
+    command: bundle exec rails s -p 5005 -e production
     ports:
-      - '4003:4003'
+      - '5005:5005'
     environment:
       - RAILS_ENV=production
     volumes:
-      - /var/docker/help-exchange-server/data:/data
+      - /var/www/help-exchange-server/data:/data
     networks:
       - mariadb_mariadb_network
       - redis_redis_network

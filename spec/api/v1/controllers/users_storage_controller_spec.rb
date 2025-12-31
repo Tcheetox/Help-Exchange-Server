@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Api::V1::UsersController, type: :request do
 
     header_auth = { :Authorization => "Bearer #{get_user_access_token("profile_user_seed@test.com")}" }
-    users_storage_route = "/fishforhelp/api/v1/users/storage"
+    users_storage_route = "/api/v1/users/storage"
 
     # POST - Create user storage
     it "create storage: valid .png" do
