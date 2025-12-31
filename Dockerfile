@@ -6,8 +6,16 @@ ENV RAILS_ENV=production
 ENV RAILS_LOG_TO_STDOUT=true
 
 # Install necessary dependencies
-RUN apt-get update -qq && apt-get install -y nodejs mariadb-client libmariadb-dev yarn libmagickwand-dev \
+RUN apt-get update -qq && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libreadline-dev \
+    zlib1g-dev \
+    nodejs \
+    mariadb-client \
+    libmariadb-dev \
     yarn \
+    libmagickwand-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
