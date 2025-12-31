@@ -4,6 +4,7 @@ FROM ruby:3.3.0-slim
 # Set environment variables
 ENV RAILS_ENV=production
 ENV RAILS_LOG_TO_STDOUT=true
+ENV BUNDLER_WITHOUT development test
 
 # Install necessary dependencies
 RUN apt-get update -qq && apt-get install -y \
